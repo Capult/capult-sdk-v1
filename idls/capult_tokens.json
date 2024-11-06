@@ -1,0 +1,170 @@
+{
+  "address": "CPLT8dWFQ1VH4ZJkvqSrLLFFPtCcKDm4XJ51t4K4mEiN",
+  "metadata": {
+    "name": "capult_tokens",
+    "version": "1.0.0",
+    "spec": "0.1.0",
+    "description": "Capult tokens tracking"
+  },
+  "instructions": [
+    {
+      "name": "add_token",
+      "discriminator": [
+        237,
+        255,
+        26,
+        54,
+        56,
+        48,
+        68,
+        52
+      ],
+      "accounts": [
+        {
+          "name": "token_details",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "remove_token",
+      "discriminator": [
+        149,
+        134,
+        57,
+        61,
+        136,
+        2,
+        144,
+        145
+      ],
+      "accounts": [
+        {
+          "name": "token_details",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_mint"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "TokenDetails",
+      "discriminator": [
+        83,
+        49,
+        200,
+        250,
+        222,
+        246,
+        143,
+        58
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "You are not authorized to perform this action."
+    },
+    {
+      "code": 6001,
+      "name": "NotAllowed",
+      "msg": "Not allowed"
+    },
+    {
+      "code": 6002,
+      "name": "MathOverflow",
+      "msg": "Math operation overflow"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidMetadataProgram",
+      "msg": "Invalid metadata program"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidTokenProgram",
+      "msg": "Invalid token program"
+    },
+    {
+      "code": 6005,
+      "name": "TokenMintMismatch",
+      "msg": "Token details and token mint account mismatch"
+    },
+    {
+      "code": 6006,
+      "name": "TokenProgramMismatch",
+      "msg": "Token program mismatch"
+    },
+    {
+      "code": 6007,
+      "name": "InvalidDecimals",
+      "msg": "Invalid decimals"
+    }
+  ],
+  "types": [
+    {
+      "name": "TokenDetails",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "manage_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_token_athority",
+            "type": "bool"
+          },
+          {
+            "name": "initialized_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "presale",
+            "type": {
+              "option": "pubkey"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "constants": [
+    {
+      "name": "TOKEN_DETAILS_SEED",
+      "type": "bytes",
+      "value": "[67, 65, 80, 85, 76, 84, 95, 84, 79, 75, 69, 78, 95, 68, 69, 84, 65, 73, 76, 83, 95, 83, 69, 69, 68]"
+    }
+  ]
+}

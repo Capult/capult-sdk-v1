@@ -1,0 +1,2131 @@
+{
+  "address": "CPTSoDzrvBad8fW2DWRgXhb2R5pa8sVdBJvZhfhuyYKe",
+  "metadata": {
+    "name": "capult_token_sales",
+    "version": "1.0.0",
+    "spec": "0.1.0",
+    "description": "Capult Token Sales"
+  },
+  "instructions": [
+    {
+      "name": "buy_tokens",
+      "discriminator": [
+        189,
+        21,
+        230,
+        133,
+        247,
+        2,
+        110,
+        42
+      ],
+      "accounts": [
+        {
+          "name": "token_sale",
+          "writable": true
+        },
+        {
+          "name": "purchase_record",
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "recipient"
+        },
+        {
+          "name": "token_sale_ata",
+          "writable": true
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "whitelist_token",
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "whitelist_token_collection",
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "mpl_core_program",
+          "optional": true
+        },
+        {
+          "name": "fee_config"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "BuyTokensArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "cancel_sale",
+      "discriminator": [
+        82,
+        137,
+        56,
+        136,
+        94,
+        9,
+        205,
+        10
+      ],
+      "accounts": [
+        {
+          "name": "token_sale",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim_refund",
+      "discriminator": [
+        15,
+        16,
+        30,
+        161,
+        255,
+        228,
+        97,
+        60
+      ],
+      "accounts": [
+        {
+          "name": "purchase_record",
+          "writable": true
+        },
+        {
+          "name": "token_sale",
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "recipient"
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "ClaimRefundArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "claim_tokens",
+      "discriminator": [
+        108,
+        216,
+        210,
+        231,
+        0,
+        212,
+        42,
+        64
+      ],
+      "accounts": [
+        {
+          "name": "purchase_record",
+          "writable": true
+        },
+        {
+          "name": "token_sale"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "recipient"
+        },
+        {
+          "name": "token_sale_ata",
+          "writable": true
+        },
+        {
+          "name": "recipient_ata",
+          "writable": true
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program"
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "ClaimTokensArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "claim_tokens_to_tlv",
+      "discriminator": [
+        174,
+        131,
+        70,
+        227,
+        7,
+        239,
+        39,
+        182
+      ],
+      "accounts": [
+        {
+          "name": "purchase_record",
+          "writable": true
+        },
+        {
+          "name": "token_sale",
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "token_lock_vault",
+          "writable": true
+        },
+        {
+          "name": "tlv_init_key"
+        },
+        {
+          "name": "token_lock_vaults_program_config"
+        },
+        {
+          "name": "token_sale_ata",
+          "writable": true
+        },
+        {
+          "name": "tlv_ata",
+          "writable": true
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "token_lock_vaults_program"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program"
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "ClaimTokensToTlvArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "collect_fees",
+      "discriminator": [
+        164,
+        152,
+        207,
+        99,
+        30,
+        186,
+        19,
+        182
+      ],
+      "accounts": [
+        {
+          "name": "token_sale",
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "withdraw_authority",
+          "signer": true
+        },
+        {
+          "name": "recipient",
+          "writable": true
+        },
+        {
+          "name": "fee_config"
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "CollectFeesArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_fee_config",
+      "discriminator": [
+        214,
+        172,
+        105,
+        64,
+        8,
+        228,
+        209,
+        204
+      ],
+      "accounts": [
+        {
+          "name": "fee_config",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "program"
+        },
+        {
+          "name": "program_data"
+        },
+        {
+          "name": "withdraw_authority"
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "CreateFeeConfigArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_sale",
+      "discriminator": [
+        137,
+        197,
+        124,
+        245,
+        254,
+        35,
+        17,
+        12
+      ],
+      "accounts": [
+        {
+          "name": "token_sale",
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "authority"
+        },
+        {
+          "name": "sale_init_key"
+        },
+        {
+          "name": "payer_ata",
+          "writable": true
+        },
+        {
+          "name": "token_sale_ata",
+          "writable": true
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "whitelist_collection",
+          "optional": true
+        },
+        {
+          "name": "fee_config"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program"
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "CreateSaleArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "end_sale",
+      "discriminator": [
+        37,
+        239,
+        52,
+        17,
+        120,
+        44,
+        213,
+        125
+      ],
+      "accounts": [
+        {
+          "name": "token_sale",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "finalize_sale",
+      "discriminator": [
+        62,
+        138,
+        254,
+        160,
+        192,
+        113,
+        177,
+        58
+      ],
+      "accounts": [
+        {
+          "name": "token_sale",
+          "writable": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "recipient",
+          "writable": true
+        },
+        {
+          "name": "token_sale_ata",
+          "writable": true
+        },
+        {
+          "name": "recipient_ata",
+          "writable": true
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program"
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "FinalizeSaleArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_authority",
+      "discriminator": [
+        133,
+        250,
+        37,
+        21,
+        110,
+        163,
+        26,
+        121
+      ],
+      "accounts": [
+        {
+          "name": "token_sale",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "new_authority"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "set_fee_config",
+      "discriminator": [
+        221,
+        222,
+        52,
+        206,
+        114,
+        198,
+        64,
+        91
+      ],
+      "accounts": [
+        {
+          "name": "fee_config",
+          "writable": true
+        },
+        {
+          "name": "new_withdraw_authority"
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "SetFeeConfigArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_fee_config_authority",
+      "discriminator": [
+        40,
+        140,
+        167,
+        0,
+        88,
+        73,
+        202,
+        142
+      ],
+      "accounts": [
+        {
+          "name": "fee_config",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "new_authority",
+          "optional": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdraw_other_tokens",
+      "discriminator": [
+        211,
+        165,
+        18,
+        53,
+        66,
+        49,
+        234,
+        111
+      ],
+      "accounts": [
+        {
+          "name": "token_sale"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "recipient"
+        },
+        {
+          "name": "token_sale_ata",
+          "writable": true
+        },
+        {
+          "name": "recipient_ata",
+          "writable": true
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program"
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "WithdrawOtherTokensArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "withdraw_tokens",
+      "discriminator": [
+        2,
+        4,
+        225,
+        61,
+        19,
+        182,
+        106,
+        170
+      ],
+      "accounts": [
+        {
+          "name": "token_sale"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "recipient"
+        },
+        {
+          "name": "token_sale_ata",
+          "writable": true
+        },
+        {
+          "name": "recipient_ata",
+          "writable": true
+        },
+        {
+          "name": "token_mint"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program"
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "WithdrawTokensArgs"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "BaseAssetV1",
+      "discriminator": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "BaseCollectionV1",
+      "discriminator": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "ProgramConfig",
+      "discriminator": [
+        196,
+        210,
+        90,
+        231,
+        144,
+        149,
+        140,
+        63
+      ]
+    },
+    {
+      "name": "ProgramFeeConfig",
+      "discriminator": [
+        137,
+        187,
+        115,
+        117,
+        88,
+        111,
+        171,
+        30
+      ]
+    },
+    {
+      "name": "PurchaseRecord",
+      "discriminator": [
+        239,
+        38,
+        40,
+        199,
+        4,
+        96,
+        209,
+        2
+      ]
+    },
+    {
+      "name": "TokenSale",
+      "discriminator": [
+        124,
+        108,
+        99,
+        6,
+        247,
+        132,
+        120,
+        233
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "NotAuthorized",
+      "msg": "You are not authorized to perform this action"
+    },
+    {
+      "code": 6001,
+      "name": "FeeTooHigh",
+      "msg": "Fee is above the maximum allowed"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidTokenProgram",
+      "msg": "Invalid token program"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidStartDate",
+      "msg": "Invalid start date"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidDecimals",
+      "msg": "Invalid decimals"
+    },
+    {
+      "code": 6005,
+      "name": "TransferHookNotAllowed",
+      "msg": "Transfer hook not allowed"
+    },
+    {
+      "code": 6006,
+      "name": "TransferFeeAmountRequired",
+      "msg": "Transfer fee amount required"
+    },
+    {
+      "code": 6007,
+      "name": "TransferFeeAmountNotRequired",
+      "msg": "Transfer fee amount not required"
+    },
+    {
+      "code": 6008,
+      "name": "InsufficientSaleBalance",
+      "msg": "Insufficient sale balance"
+    },
+    {
+      "code": 6009,
+      "name": "InsufficientWithdrawableAmount",
+      "msg": "Insufficient withdrawable amount"
+    },
+    {
+      "code": 6010,
+      "name": "InsufficientSaleLamportBalance",
+      "msg": "Insufficient sale lamport balance"
+    },
+    {
+      "code": 6011,
+      "name": "InvalidTokenMint",
+      "msg": "Invalid token mint"
+    },
+    {
+      "code": 6012,
+      "name": "IncorrectWithdrawAuthority",
+      "msg": "Incorrect withdraw authority"
+    },
+    {
+      "code": 6013,
+      "name": "InsufficientBalance",
+      "msg": "Insufficient token balance"
+    },
+    {
+      "code": 6014,
+      "name": "InvalidUnlockIntervalEndDate",
+      "msg": "Invalid unlock interval and end date combination"
+    },
+    {
+      "code": 6015,
+      "name": "NoFeesToCollect",
+      "msg": "No fees to collect"
+    },
+    {
+      "code": 6016,
+      "name": "AmountIsZero",
+      "msg": "Amount is zero"
+    },
+    {
+      "code": 6017,
+      "name": "WithdrawableAmountAfterFeesIsZero",
+      "msg": "Withdrawable amount after transfer fees is zero"
+    },
+    {
+      "code": 6018,
+      "name": "InvalidSaleAmount",
+      "msg": "Invalid sale amount"
+    },
+    {
+      "code": 6019,
+      "name": "InvalidSalePrice",
+      "msg": "Invalid sale price"
+    },
+    {
+      "code": 6020,
+      "name": "InvalidStartSlot",
+      "msg": "Invalid start slot"
+    },
+    {
+      "code": 6021,
+      "name": "InvalidEndSlot",
+      "msg": "Invalid end slot"
+    },
+    {
+      "code": 6022,
+      "name": "InvalidMinBuyAmount",
+      "msg": "Invalid min buy amount"
+    },
+    {
+      "code": 6023,
+      "name": "InvalidMaxBuyAmount",
+      "msg": "Invalid max buy amount"
+    },
+    {
+      "code": 6024,
+      "name": "InvalidMaxAmountPerAddress",
+      "msg": "Invalid max amount per address"
+    },
+    {
+      "code": 6025,
+      "name": "InvalidRefundAllowedCap",
+      "msg": "Invalid refund allowed cap"
+    },
+    {
+      "code": 6026,
+      "name": "InvalidAccessConfig",
+      "msg": "Cannot use both an allowlist and a whitelist token"
+    },
+    {
+      "code": 6027,
+      "name": "WhitelistTokenMintRequired",
+      "msg": "Whitelist token mint required when using a whitelist"
+    },
+    {
+      "code": 6028,
+      "name": "InsufficientLamportsBalance",
+      "msg": "Insufficient lamports balance"
+    },
+    {
+      "code": 6029,
+      "name": "InsufficientSaleTokenBalance",
+      "msg": "Insufficient sale token balance"
+    },
+    {
+      "code": 6030,
+      "name": "InvalidTokenAmount",
+      "msg": "Invalid token amount"
+    },
+    {
+      "code": 6031,
+      "name": "InvalidBump",
+      "msg": "Invalid bump"
+    },
+    {
+      "code": 6032,
+      "name": "SaleNotActive",
+      "msg": "Sale not active"
+    },
+    {
+      "code": 6033,
+      "name": "TokenAmountBelowMinimum",
+      "msg": "Token amount below minimum"
+    },
+    {
+      "code": 6034,
+      "name": "TokenAmountExceedsMaximum",
+      "msg": "Token amount exceeds maximum"
+    },
+    {
+      "code": 6035,
+      "name": "TokenAmountExceedsMaxPerAddress",
+      "msg": "Token amount exceeds max per address"
+    },
+    {
+      "code": 6036,
+      "name": "NoAllowlist",
+      "msg": "No allowlist"
+    },
+    {
+      "code": 6037,
+      "name": "NoWhitelistToken",
+      "msg": "Sale does not have a whitelist token"
+    },
+    {
+      "code": 6038,
+      "name": "WhitelistTokenRequired",
+      "msg": "Whitelist token required"
+    },
+    {
+      "code": 6039,
+      "name": "AllowlistProofRequired",
+      "msg": "Allowlist proof required"
+    },
+    {
+      "code": 6040,
+      "name": "NotAllowlisted",
+      "msg": "Not allowlisted"
+    },
+    {
+      "code": 6041,
+      "name": "BotTaxTooHigh",
+      "msg": "Bot tax too high"
+    },
+    {
+      "code": 6042,
+      "name": "WhitelistCollectionRequired",
+      "msg": "Whitelist collection required"
+    },
+    {
+      "code": 6043,
+      "name": "MetaplexCoreProgramRequired",
+      "msg": "Metaplex Core program required"
+    },
+    {
+      "code": 6044,
+      "name": "InvalidWhitelistToken",
+      "msg": "Invalid whitelist token"
+    },
+    {
+      "code": 6045,
+      "name": "InvalidWhitelistTokenCollection",
+      "msg": "Invalid whitelist token collection"
+    },
+    {
+      "code": 6046,
+      "name": "InvalidTokenSale",
+      "msg": "Invalid token sale"
+    },
+    {
+      "code": 6047,
+      "name": "TokenSaleHasUnlockSchedule",
+      "msg": "Token sale has an unlock schedule"
+    },
+    {
+      "code": 6048,
+      "name": "TokenSaleHasNoUnlockSchedule",
+      "msg": "Token sale has no unlock schedule"
+    },
+    {
+      "code": 6049,
+      "name": "InvalidLamportsAmount",
+      "msg": "Invalid lamports amount"
+    },
+    {
+      "code": 6050,
+      "name": "InsufficientSaleLamportsBalance",
+      "msg": "Insufficient sale lamports balance"
+    },
+    {
+      "code": 6051,
+      "name": "RefundNotAllowed",
+      "msg": "Refund not allowed"
+    },
+    {
+      "code": 6052,
+      "name": "ClaimingNotAllowed",
+      "msg": "Claiming not allowed at this stage"
+    },
+    {
+      "code": 6053,
+      "name": "InvalidPurchaseRecordAuthority",
+      "msg": "Invalid purchase record authority"
+    },
+    {
+      "code": 6054,
+      "name": "ArithmeticError",
+      "msg": "Arithmetic error"
+    },
+    {
+      "code": 6055,
+      "name": "SaleAlreadyFinalized",
+      "msg": "Sale already finalized"
+    },
+    {
+      "code": 6056,
+      "name": "SaleNotFinalized",
+      "msg": "Sale not finalized"
+    },
+    {
+      "code": 6057,
+      "name": "SaleCancelled",
+      "msg": "Sale cancelled"
+    },
+    {
+      "code": 6058,
+      "name": "RefundsAllowed",
+      "msg": "Refunds allowed"
+    },
+    {
+      "code": 6059,
+      "name": "AmountMustBeGreaterThanZero",
+      "msg": "Amount must be greater than zero"
+    },
+    {
+      "code": 6060,
+      "name": "SaleNotCancelled",
+      "msg": "Sale not cancelled"
+    },
+    {
+      "code": 6061,
+      "name": "SaleFinalized",
+      "msg": "Sale finalized"
+    },
+    {
+      "code": 6062,
+      "name": "SaleAlreadyCancelled",
+      "msg": "Sale already cancelled"
+    },
+    {
+      "code": 6063,
+      "name": "SaleAlreadyEnded",
+      "msg": "Sale already ended"
+    },
+    {
+      "code": 6064,
+      "name": "SaleNotEnded",
+      "msg": "Sale not ended"
+    },
+    {
+      "code": 6065,
+      "name": "InvalidPriceDecimals",
+      "msg": "Invalid price decimals"
+    },
+    {
+      "code": 6066,
+      "name": "PriceIsZero",
+      "msg": "Price is zero"
+    },
+    {
+      "code": 6067,
+      "name": "PriceError",
+      "msg": "Price error"
+    },
+    {
+      "code": 6068,
+      "name": "SaleSolAmountTooHigh",
+      "msg": "Sale sol amount too high"
+    }
+  ],
+  "types": [
+    {
+      "name": "AccessConfig",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Allowlist",
+            "fields": [
+              {
+                "defined": {
+                  "name": "Allowlist"
+                }
+              }
+            ]
+          },
+          {
+            "name": "WhitelistToken",
+            "fields": [
+              {
+                "defined": {
+                  "name": "WhitelistTokenConfig"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "AccessConfigSetup",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Allowlist",
+            "fields": [
+              {
+                "defined": {
+                  "name": "Allowlist"
+                }
+              }
+            ]
+          },
+          {
+            "name": "WhitelistToken",
+            "fields": [
+              {
+                "defined": {
+                  "name": "WhitelistTokenConfigSetup"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Allowlist",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "AutoClaimSetupArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "min_interval",
+            "type": "i64"
+          },
+          {
+            "name": "min_amount",
+            "type": "u64"
+          },
+          {
+            "name": "lamports_for_fees",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BaseAssetV1",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "key",
+            "type": {
+              "defined": {
+                "name": "Key"
+              }
+            }
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "update_authority",
+            "type": {
+              "defined": {
+                "name": "UpdateAuthority"
+              }
+            }
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          },
+          {
+            "name": "seq",
+            "type": {
+              "option": "u64"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "BaseCollectionV1",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "key",
+            "type": {
+              "defined": {
+                "name": "Key"
+              }
+            }
+          },
+          {
+            "name": "update_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          },
+          {
+            "name": "num_minted",
+            "type": "u32"
+          },
+          {
+            "name": "current_size",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BuyTokensArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token_amount",
+            "type": "u64"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "lamports_to_pay",
+            "type": "u64"
+          },
+          {
+            "name": "allowlist_proof",
+            "type": {
+              "option": {
+                "vec": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ClaimRefundArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lamports_to_refund",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ClaimTokensArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token_amount",
+            "type": "u64"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "transfer_fee_amount",
+            "type": {
+              "option": "u64"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ClaimTokensToTlvArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token_amount",
+            "type": "u64"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "transfer_fee_amount",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "auto_claim_setup",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "AutoClaimSetupArgs"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CollectFeesArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lamports_to_withdraw",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateFeeConfigArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "create_sale_fee",
+            "type": "u64"
+          },
+          {
+            "name": "bot_tax",
+            "type": "u64"
+          },
+          {
+            "name": "buy_fee_basis_points",
+            "type": "u16"
+          },
+          {
+            "name": "withdraw_fee_basis_points",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateSaleArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "sale_amount",
+            "type": "u64"
+          },
+          {
+            "name": "price",
+            "type": {
+              "defined": {
+                "name": "Price"
+              }
+            }
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "transfer_fee_amount",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "start_slot",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "end_slot",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "sale_parameters",
+            "type": {
+              "defined": {
+                "name": "SaleParameters"
+              }
+            }
+          },
+          {
+            "name": "unlock_schedule",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "UnlockSchedule"
+                }
+              }
+            }
+          },
+          {
+            "name": "access_config",
+            "type": {
+              "defined": {
+                "name": "AccessConfigSetup"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "FeeConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "withdraw_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "create_vault_fee",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FinalizeSaleArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "unsold_token_amount",
+            "type": "u64"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "transfer_fee_amount",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "lamports_after_capult_fee",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Key",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Uninitialized"
+          },
+          {
+            "name": "AssetV1"
+          },
+          {
+            "name": "HashedAssetV1"
+          },
+          {
+            "name": "PluginHeaderV1"
+          },
+          {
+            "name": "PluginRegistryV1"
+          },
+          {
+            "name": "CollectionV1"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Price",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "value",
+            "type": "u64"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProgramConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fee_config_authority",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "reward_config_authority",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "fee_config",
+            "type": {
+              "defined": {
+                "name": "FeeConfig"
+              }
+            }
+          },
+          {
+            "name": "reward_config",
+            "type": {
+              "defined": {
+                "name": "RewardConfig"
+              }
+            }
+          },
+          {
+            "name": "initialized_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProgramFeeConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "withdraw_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "create_sale_fee",
+            "type": "u64"
+          },
+          {
+            "name": "bot_tax",
+            "type": "u64"
+          },
+          {
+            "name": "buy_fee_basis_points",
+            "type": "u16"
+          },
+          {
+            "name": "withdraw_fee_basis_points",
+            "type": "u16"
+          },
+          {
+            "name": "initialized_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PurchaseRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_sale",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount_bought",
+            "type": "u64"
+          },
+          {
+            "name": "lamports_paid",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RewardConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "ata_init_reward",
+            "type": "u64"
+          },
+          {
+            "name": "auto_claim_reward",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SaleFeeConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "create_sale_fee",
+            "type": "u64"
+          },
+          {
+            "name": "buy_fee_basis_points",
+            "type": "u16"
+          },
+          {
+            "name": "withdraw_fee_basis_points",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SaleParameters",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "min_buy_amount",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "max_buy_amount",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "max_amount_per_address",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "refund_allowed_cap",
+            "type": {
+              "option": "u64"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SaleSchedule",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "start_slot",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "end_slot",
+            "type": {
+              "option": "u64"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetFeeConfigArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "create_sale_fee",
+            "type": "u64"
+          },
+          {
+            "name": "bot_tax",
+            "type": "u64"
+          },
+          {
+            "name": "buy_fee_basis_points",
+            "type": "u16"
+          },
+          {
+            "name": "withdraw_fee_basis_points",
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenSale",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "price",
+            "type": {
+              "defined": {
+                "name": "Price"
+              }
+            }
+          },
+          {
+            "name": "sale_amount",
+            "type": "u64"
+          },
+          {
+            "name": "amount_sold",
+            "type": "u64"
+          },
+          {
+            "name": "sale_schedule",
+            "type": {
+              "defined": {
+                "name": "SaleSchedule"
+              }
+            }
+          },
+          {
+            "name": "sale_parameters",
+            "type": {
+              "defined": {
+                "name": "SaleParameters"
+              }
+            }
+          },
+          {
+            "name": "unlock_schedule",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "UnlockSchedule"
+                }
+              }
+            }
+          },
+          {
+            "name": "access_config",
+            "type": {
+              "defined": {
+                "name": "AccessConfig"
+              }
+            }
+          },
+          {
+            "name": "sale_init_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "sale_fee_config",
+            "type": {
+              "defined": {
+                "name": "SaleFeeConfig"
+              }
+            }
+          },
+          {
+            "name": "cancelled",
+            "type": "bool"
+          },
+          {
+            "name": "finalized",
+            "type": "bool"
+          },
+          {
+            "name": "initialized_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UnlockSchedule",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "start_date",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "end_date",
+            "type": "i64"
+          },
+          {
+            "name": "interval",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "cliff_basis_points",
+            "type": {
+              "option": "u16"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateAuthority",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Address",
+            "fields": [
+              "pubkey"
+            ]
+          },
+          {
+            "name": "Collection",
+            "fields": [
+              "pubkey"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "WhitelistTokenConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "collection",
+            "type": "pubkey"
+          },
+          {
+            "name": "burn_whitelist_token",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WhitelistTokenConfigSetup",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "burn_whitelist_token",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawOtherTokensArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token_amount",
+            "type": "u64"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "transfer_fee_amount",
+            "type": {
+              "option": "u64"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawTokensArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token_amount",
+            "type": "u64"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "transfer_fee_amount",
+            "type": {
+              "option": "u64"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "constants": [
+    {
+      "name": "CAPULT_SEED",
+      "type": "bytes",
+      "value": "[67, 65, 80, 85, 76, 84, 95, 83, 69, 69, 68]"
+    },
+    {
+      "name": "FEE_CONFIG_SEED",
+      "type": "bytes",
+      "value": "[70, 69, 69, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68]"
+    },
+    {
+      "name": "MAX_BOT_TAX",
+      "type": "u64",
+      "value": "500000000"
+    },
+    {
+      "name": "MAX_FEE",
+      "type": "u64",
+      "value": "5000000000"
+    },
+    {
+      "name": "MAX_FEE_BASIS_POINTS",
+      "type": "u16",
+      "value": "500"
+    },
+    {
+      "name": "MAX_SALE_SOL_AMOUNT",
+      "type": "u64",
+      "value": "1000000000000000"
+    },
+    {
+      "name": "PURCHASE_RECORD_SEED",
+      "type": "bytes",
+      "value": "[80, 85, 82, 67, 72, 65, 83, 69, 95, 82, 69, 67, 79, 82, 68, 95, 83, 69, 69, 68]"
+    },
+    {
+      "name": "TOKEN_SALE_SEED",
+      "type": "bytes",
+      "value": "[84, 79, 75, 69, 78, 95, 83, 65, 76, 69, 95, 83, 69, 69, 68]"
+    }
+  ]
+}
