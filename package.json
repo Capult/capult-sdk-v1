@@ -1,11 +1,31 @@
 {
+  "name": "@capult/sdk",
+  "version": "1.0.0",
+  "description": "JavaScript SDK for Capult protocol",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Capult/capult-sdk-v1.git"
+  },
+  "keywords": ["solana", "blockchain", "capult", "sdk"],
+  "author": "Capult",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@metaplex-foundation/umi": "^0.9.2"
+  },
   "devDependencies": {
     "typescript": "^4.9.4"
-  },
-  "dependencies": {
-    "@codama/nodes-from-anchor": "^1.0.0",
-    "@codama/renderers": "^1.0.3",
-    "@metaplex-foundation/umi": "^0.9.2",
-    "codama": "^1.0.0"
   }
 }
