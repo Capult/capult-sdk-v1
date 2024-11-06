@@ -19,7 +19,12 @@
     "type": "git",
     "url": "git+https://github.com/Capult/capult-sdk-v1.git"
   },
-  "keywords": ["solana", "blockchain", "capult", "sdk"],
+  "keywords": [
+    "solana",
+    "blockchain",
+    "capult",
+    "sdk"
+  ],
   "author": "Capult",
   "license": "GPL-3.0",
   "dependencies": {
