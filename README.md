@@ -12,5 +12,4 @@ npm install @capult/sdk
 
 ```typescript
 import { CapultTokens } from '@capult/sdk';
-
 ```
