@@ -1,0 +1,28 @@
+name: Sync from Program Library
+
+on:
+  repository_dispatch:
+    types: [sync-sdk]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Fetch from Program Library
+        run: |
+          git remote add program-library https://github.com/Capult/capult-program-library.git
+          git fetch program-library master
+          git checkout main
+          git rm -rf .
+          git checkout program-library/master -- clients/js/src/
+          mv clients/js/src/* .
+          rm -rf clients
+          git add .
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Sync from program library"
+          git push origin main
