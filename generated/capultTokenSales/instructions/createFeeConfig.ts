@@ -13,7 +13,8 @@ import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners
 // Accounts.
 export type CreateFeeConfigInstructionAccounts = {
   feeConfig: PublicKey | Pda;
-  authority?: Signer;
+  payer?: Signer;
+  authority?: PublicKey | Pda;
   program: PublicKey | Pda;
   programData: PublicKey | Pda;
   withdrawAuthority: PublicKey | Pda;
@@ -60,7 +61,7 @@ export type CreateFeeConfigInstructionArgs = CreateFeeConfigInstructionDataArgs;
 
 // Instruction.
 export function createFeeConfig(
-  context: Pick<Context, 'identity' | 'programs'>,
+  context: Pick<Context, 'identity' | 'payer' | 'programs'>,
   input: CreateFeeConfigInstructionAccounts & CreateFeeConfigInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -69,19 +70,23 @@ export function createFeeConfig(
   // Accounts.
   const resolvedAccounts = {
     feeConfig: { index: 0, isWritable: true as boolean, value: input.feeConfig ?? null },
-    authority: { index: 1, isWritable: true as boolean, value: input.authority ?? null },
-    program: { index: 2, isWritable: false as boolean, value: input.program ?? null },
-    programData: { index: 3, isWritable: false as boolean, value: input.programData ?? null },
-    withdrawAuthority: { index: 4, isWritable: false as boolean, value: input.withdrawAuthority ?? null },
-    systemProgram: { index: 5, isWritable: false as boolean, value: input.systemProgram ?? null },
+    payer: { index: 1, isWritable: true as boolean, value: input.payer ?? null },
+    authority: { index: 2, isWritable: false as boolean, value: input.authority ?? null },
+    program: { index: 3, isWritable: false as boolean, value: input.program ?? null },
+    programData: { index: 4, isWritable: false as boolean, value: input.programData ?? null },
+    withdrawAuthority: { index: 5, isWritable: false as boolean, value: input.withdrawAuthority ?? null },
+    systemProgram: { index: 6, isWritable: false as boolean, value: input.systemProgram ?? null },
   } satisfies ResolvedAccountsWithIndices;
 
   // Arguments.
   const resolvedArgs: CreateFeeConfigInstructionArgs = { ...input };
 
   // Default values.
+  if (!resolvedAccounts.payer.value) {
+    resolvedAccounts.payer.value = context.payer;
+  }
   if (!resolvedAccounts.authority.value) {
-    resolvedAccounts.authority.value = context.identity;
+    resolvedAccounts.authority.value = context.identity.publicKey;
   }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(

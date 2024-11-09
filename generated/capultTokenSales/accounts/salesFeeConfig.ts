@@ -34,9 +34,9 @@ import {
   u8,
 } from '@metaplex-foundation/umi/serializers';
 
-export type ProgramFeeConfig = Account<ProgramFeeConfigAccountData>;
+export type SalesFeeConfig = Account<SalesFeeConfigAccountData>;
 
-export type ProgramFeeConfigAccountData = {
+export type SalesFeeConfigAccountData = {
   discriminator: Uint8Array;
   authority: Option<PublicKey>;
   withdrawAuthority: PublicKey;
@@ -48,7 +48,7 @@ export type ProgramFeeConfigAccountData = {
   bump: number;
 };
 
-export type ProgramFeeConfigAccountDataArgs = {
+export type SalesFeeConfigAccountDataArgs = {
   authority: OptionOrNullable<PublicKey>;
   withdrawAuthority: PublicKey;
   createSaleFee: number | bigint;
@@ -59,12 +59,12 @@ export type ProgramFeeConfigAccountDataArgs = {
   bump: number;
 };
 
-export function getProgramFeeConfigAccountDataSerializer(): Serializer<
-  ProgramFeeConfigAccountDataArgs,
-  ProgramFeeConfigAccountData
+export function getSalesFeeConfigAccountDataSerializer(): Serializer<
+  SalesFeeConfigAccountDataArgs,
+  SalesFeeConfigAccountData
 > {
-  return mapSerializer<ProgramFeeConfigAccountDataArgs, any, ProgramFeeConfigAccountData>(
-    struct<ProgramFeeConfigAccountData>(
+  return mapSerializer<SalesFeeConfigAccountDataArgs, any, SalesFeeConfigAccountData>(
+    struct<SalesFeeConfigAccountData>(
       [
         ['discriminator', bytes({ size: 8 })],
         ['authority', option(publicKeySerializer())],
@@ -76,65 +76,65 @@ export function getProgramFeeConfigAccountDataSerializer(): Serializer<
         ['initializedAt', i64()],
         ['bump', u8()],
       ],
-      { description: 'ProgramFeeConfigAccountData' }
+      { description: 'SalesFeeConfigAccountData' }
     ),
-    (value) => ({ ...value, discriminator: new Uint8Array([137, 187, 115, 117, 88, 111, 171, 30]) })
-  ) as Serializer<ProgramFeeConfigAccountDataArgs, ProgramFeeConfigAccountData>;
+    (value) => ({ ...value, discriminator: new Uint8Array([71, 173, 154, 91, 136, 69, 93, 88]) })
+  ) as Serializer<SalesFeeConfigAccountDataArgs, SalesFeeConfigAccountData>;
 }
 
-export function deserializeProgramFeeConfig(rawAccount: RpcAccount): ProgramFeeConfig {
-  return deserializeAccount(rawAccount, getProgramFeeConfigAccountDataSerializer());
+export function deserializeSalesFeeConfig(rawAccount: RpcAccount): SalesFeeConfig {
+  return deserializeAccount(rawAccount, getSalesFeeConfigAccountDataSerializer());
 }
 
-export async function fetchProgramFeeConfig(
+export async function fetchSalesFeeConfig(
   context: Pick<Context, 'rpc'>,
   publicKey: PublicKey | Pda,
   options?: RpcGetAccountOptions
-): Promise<ProgramFeeConfig> {
+): Promise<SalesFeeConfig> {
   const maybeAccount = await context.rpc.getAccount(toPublicKey(publicKey, false), options);
-  assertAccountExists(maybeAccount, 'ProgramFeeConfig');
-  return deserializeProgramFeeConfig(maybeAccount);
+  assertAccountExists(maybeAccount, 'SalesFeeConfig');
+  return deserializeSalesFeeConfig(maybeAccount);
 }
 
-export async function safeFetchProgramFeeConfig(
+export async function safeFetchSalesFeeConfig(
   context: Pick<Context, 'rpc'>,
   publicKey: PublicKey | Pda,
   options?: RpcGetAccountOptions
-): Promise<ProgramFeeConfig | null> {
+): Promise<SalesFeeConfig | null> {
   const maybeAccount = await context.rpc.getAccount(toPublicKey(publicKey, false), options);
-  return maybeAccount.exists ? deserializeProgramFeeConfig(maybeAccount) : null;
+  return maybeAccount.exists ? deserializeSalesFeeConfig(maybeAccount) : null;
 }
 
-export async function fetchAllProgramFeeConfig(
+export async function fetchAllSalesFeeConfig(
   context: Pick<Context, 'rpc'>,
   publicKeys: Array<PublicKey | Pda>,
   options?: RpcGetAccountsOptions
-): Promise<ProgramFeeConfig[]> {
+): Promise<SalesFeeConfig[]> {
   const maybeAccounts = await context.rpc.getAccounts(
     publicKeys.map((key) => toPublicKey(key, false)),
     options
   );
   return maybeAccounts.map((maybeAccount) => {
-    assertAccountExists(maybeAccount, 'ProgramFeeConfig');
-    return deserializeProgramFeeConfig(maybeAccount);
+    assertAccountExists(maybeAccount, 'SalesFeeConfig');
+    return deserializeSalesFeeConfig(maybeAccount);
   });
 }
 
-export async function safeFetchAllProgramFeeConfig(
+export async function safeFetchAllSalesFeeConfig(
   context: Pick<Context, 'rpc'>,
   publicKeys: Array<PublicKey | Pda>,
   options?: RpcGetAccountsOptions
-): Promise<ProgramFeeConfig[]> {
+): Promise<SalesFeeConfig[]> {
   const maybeAccounts = await context.rpc.getAccounts(
     publicKeys.map((key) => toPublicKey(key, false)),
     options
   );
   return maybeAccounts
     .filter((maybeAccount) => maybeAccount.exists)
-    .map((maybeAccount) => deserializeProgramFeeConfig(maybeAccount as RpcAccount));
+    .map((maybeAccount) => deserializeSalesFeeConfig(maybeAccount as RpcAccount));
 }
 
-export function getProgramFeeConfigGpaBuilder(context: Pick<Context, 'rpc' | 'programs'>) {
+export function getSalesFeeConfigGpaBuilder(context: Pick<Context, 'rpc' | 'programs'>) {
   const programId = context.programs.getPublicKey('capultTokenSales', 'CPTSoDzrvBad8fW2DWRgXhb2R5pa8sVdBJvZhfhuyYKe');
   return gpaBuilder(context, programId)
     .registerFields<{
@@ -158,6 +158,6 @@ export function getProgramFeeConfigGpaBuilder(context: Pick<Context, 'rpc' | 'pr
       initializedAt: [null, i64()],
       bump: [null, u8()],
     })
-    .deserializeUsing<ProgramFeeConfig>((account) => deserializeProgramFeeConfig(account))
-    .whereField('discriminator', new Uint8Array([137, 187, 115, 117, 88, 111, 171, 30]));
+    .deserializeUsing<SalesFeeConfig>((account) => deserializeSalesFeeConfig(account))
+    .whereField('discriminator', new Uint8Array([71, 173, 154, 91, 136, 69, 93, 88]));
 }

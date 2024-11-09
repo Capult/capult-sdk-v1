@@ -9,6 +9,6 @@
 export * from './baseAssetV1';
 export * from './baseCollectionV1';
 export * from './programConfig';
-export * from './programFeeConfig';
 export * from './purchaseRecord';
+export * from './salesFeeConfig';
 export * from './tokenSale';
