@@ -12,7 +12,7 @@ import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners
 
 // Accounts.
 export type SetRewardConfigInstructionAccounts = {
-  programConfig: PublicKey | Pda;
+  programConfig?: PublicKey | Pda;
   authority?: Signer;
 };
 
@@ -47,7 +47,7 @@ export type SetRewardConfigInstructionArgs = SetRewardConfigInstructionDataArgs;
 
 // Instruction.
 export function setRewardConfig(
-  context: Pick<Context, 'identity' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'identity' | 'programs'>,
   input: SetRewardConfigInstructionAccounts & SetRewardConfigInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -66,6 +66,11 @@ export function setRewardConfig(
   const resolvedArgs: SetRewardConfigInstructionArgs = { ...input };
 
   // Default values.
+  if (!resolvedAccounts.programConfig.value) {
+    resolvedAccounts.programConfig.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([80, 82, 79, 71, 82, 65, 77, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])),
+    ]);
+  }
   if (!resolvedAccounts.authority.value) {
     resolvedAccounts.authority.value = context.identity;
   }

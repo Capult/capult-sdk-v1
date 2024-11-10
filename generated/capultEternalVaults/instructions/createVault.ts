@@ -16,22 +16,32 @@ import {
   TransactionBuilder,
   transactionBuilder,
 } from '@metaplex-foundation/umi';
-import { Serializer, bytes, i64, mapSerializer, option, struct, u64, u8 } from '@metaplex-foundation/umi/serializers';
-import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners } from '../shared';
+import {
+  Serializer,
+  bytes,
+  i64,
+  mapSerializer,
+  option,
+  publicKey as publicKeySerializer,
+  struct,
+  u64,
+  u8,
+} from '@metaplex-foundation/umi/serializers';
+import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccountMetasAndSigners } from '../shared';
 
 // Accounts.
 export type CreateVaultInstructionAccounts = {
-  eternalVault: PublicKey | Pda;
+  eternalVault?: PublicKey | Pda;
   vaultInitKey: PublicKey | Pda;
   authority?: PublicKey | Pda;
   payer?: Signer;
   tokenPayer: Signer;
-  fromAta: PublicKey | Pda;
-  vaultAta: PublicKey | Pda;
+  tokenPayerAta?: PublicKey | Pda;
+  vaultAta?: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
-  capultFeeConfig: PublicKey | Pda;
+  capultFeeConfig?: PublicKey | Pda;
   tokenProgram?: PublicKey | Pda;
-  associatedTokenProgram: PublicKey | Pda;
+  associatedTokenProgram?: PublicKey | Pda;
   systemProgram?: PublicKey | Pda;
 };
 
@@ -75,7 +85,7 @@ export type CreateVaultInstructionArgs = CreateVaultInstructionDataArgs;
 
 // Instruction.
 export function createVault(
-  context: Pick<Context, 'identity' | 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'identity' | 'payer' | 'programs'>,
   input: CreateVaultInstructionAccounts & CreateVaultInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -91,7 +101,7 @@ export function createVault(
     authority: { index: 2, isWritable: false as boolean, value: input.authority ?? null },
     payer: { index: 3, isWritable: true as boolean, value: input.payer ?? null },
     tokenPayer: { index: 4, isWritable: true as boolean, value: input.tokenPayer ?? null },
-    fromAta: { index: 5, isWritable: true as boolean, value: input.fromAta ?? null },
+    tokenPayerAta: { index: 5, isWritable: true as boolean, value: input.tokenPayerAta ?? null },
     vaultAta: { index: 6, isWritable: true as boolean, value: input.vaultAta ?? null },
     tokenMint: { index: 7, isWritable: false as boolean, value: input.tokenMint ?? null },
     capultFeeConfig: { index: 8, isWritable: false as boolean, value: input.capultFeeConfig ?? null },
@@ -104,6 +114,13 @@ export function createVault(
   const resolvedArgs: CreateVaultInstructionArgs = { ...input };
 
   // Default values.
+  if (!resolvedAccounts.eternalVault.value) {
+    resolvedAccounts.eternalVault.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([67, 65, 80, 85, 76, 84, 95, 83, 69, 69, 68])),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.vaultInitKey.value)),
+      bytes().serialize(new Uint8Array([69, 84, 69, 82, 78, 65, 76, 95, 86, 65, 85, 76, 84, 95, 83, 69, 69, 68])),
+    ]);
+  }
   if (!resolvedAccounts.authority.value) {
     resolvedAccounts.authority.value = context.identity.publicKey;
   }
@@ -117,9 +134,35 @@ export function createVault(
     );
     resolvedAccounts.tokenProgram.isWritable = false;
   }
+  if (!resolvedAccounts.tokenPayerAta.value) {
+    resolvedAccounts.tokenPayerAta.value = context.eddsa.findPda(programId, [
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenPayer.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+    ]);
+  }
+  if (!resolvedAccounts.vaultAta.value) {
+    resolvedAccounts.vaultAta.value = context.eddsa.findPda(programId, [
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.eternalVault.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+    ]);
+  }
+  if (!resolvedAccounts.capultFeeConfig.value) {
+    resolvedAccounts.capultFeeConfig.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([70, 69, 69, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])),
+    ]);
+  }
+  if (!resolvedAccounts.associatedTokenProgram.value) {
+    resolvedAccounts.associatedTokenProgram.value = context.programs.getPublicKey(
+      'associatedTokenProgram',
+      'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+    );
+    resolvedAccounts.associatedTokenProgram.isWritable = false;
+  }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
-      'splSystem',
+      'systemProgram',
       '11111111111111111111111111111111'
     );
     resolvedAccounts.systemProgram.isWritable = false;

@@ -16,19 +16,28 @@ import {
   TransactionBuilder,
   transactionBuilder,
 } from '@metaplex-foundation/umi';
-import { Serializer, bytes, mapSerializer, option, struct, u64, u8 } from '@metaplex-foundation/umi/serializers';
-import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners } from '../shared';
+import {
+  Serializer,
+  bytes,
+  mapSerializer,
+  option,
+  publicKey as publicKeySerializer,
+  struct,
+  u64,
+  u8,
+} from '@metaplex-foundation/umi/serializers';
+import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccountMetasAndSigners } from '../shared';
 
 // Accounts.
 export type DepositTokensInstructionAccounts = {
   tokenLockVault: PublicKey | Pda;
   payer?: Signer;
   tokenPayer: Signer;
-  fromAta: PublicKey | Pda;
-  vaultAta: PublicKey | Pda;
+  tokenPayerAta?: PublicKey | Pda;
+  vaultAta?: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
   tokenProgram?: PublicKey | Pda;
-  associatedTokenProgram: PublicKey | Pda;
+  associatedTokenProgram?: PublicKey | Pda;
   systemProgram?: PublicKey | Pda;
 };
 
@@ -69,7 +78,7 @@ export type DepositTokensInstructionArgs = DepositTokensInstructionDataArgs;
 
 // Instruction.
 export function depositTokens(
-  context: Pick<Context, 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'payer' | 'programs'>,
   input: DepositTokensInstructionAccounts & DepositTokensInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -83,7 +92,7 @@ export function depositTokens(
     tokenLockVault: { index: 0, isWritable: false as boolean, value: input.tokenLockVault ?? null },
     payer: { index: 1, isWritable: true as boolean, value: input.payer ?? null },
     tokenPayer: { index: 2, isWritable: false as boolean, value: input.tokenPayer ?? null },
-    fromAta: { index: 3, isWritable: true as boolean, value: input.fromAta ?? null },
+    tokenPayerAta: { index: 3, isWritable: true as boolean, value: input.tokenPayerAta ?? null },
     vaultAta: { index: 4, isWritable: true as boolean, value: input.vaultAta ?? null },
     tokenMint: { index: 5, isWritable: false as boolean, value: input.tokenMint ?? null },
     tokenProgram: { index: 6, isWritable: false as boolean, value: input.tokenProgram ?? null },
@@ -105,9 +114,30 @@ export function depositTokens(
     );
     resolvedAccounts.tokenProgram.isWritable = false;
   }
+  if (!resolvedAccounts.tokenPayerAta.value) {
+    resolvedAccounts.tokenPayerAta.value = context.eddsa.findPda(programId, [
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenPayer.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+    ]);
+  }
+  if (!resolvedAccounts.vaultAta.value) {
+    resolvedAccounts.vaultAta.value = context.eddsa.findPda(programId, [
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenLockVault.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+    ]);
+  }
+  if (!resolvedAccounts.associatedTokenProgram.value) {
+    resolvedAccounts.associatedTokenProgram.value = context.programs.getPublicKey(
+      'associatedTokenProgram',
+      'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+    );
+    resolvedAccounts.associatedTokenProgram.isWritable = false;
+  }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
-      'splSystem',
+      'systemProgram',
       '11111111111111111111111111111111'
     );
     resolvedAccounts.systemProgram.isWritable = false;

@@ -7,19 +7,25 @@
  */
 
 import { Context, Pda, PublicKey, Signer, TransactionBuilder, transactionBuilder } from '@metaplex-foundation/umi';
-import { Serializer, bytes, mapSerializer, struct } from '@metaplex-foundation/umi/serializers';
-import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners } from '../shared';
+import {
+  Serializer,
+  bytes,
+  mapSerializer,
+  publicKey as publicKeySerializer,
+  struct,
+} from '@metaplex-foundation/umi/serializers';
+import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccountMetasAndSigners } from '../shared';
 
 // Accounts.
 export type InitializeWithdrawAtaInstructionAccounts = {
   tokenLockVault: PublicKey | Pda;
   initiator: Signer;
   withdrawAuthority: PublicKey | Pda;
-  withdrawAta: PublicKey | Pda;
+  withdrawAta?: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
-  programConfig: PublicKey | Pda;
+  programConfig?: PublicKey | Pda;
   tokenProgram?: PublicKey | Pda;
-  associatedTokenProgram: PublicKey | Pda;
+  associatedTokenProgram?: PublicKey | Pda;
   systemProgram?: PublicKey | Pda;
 };
 
@@ -42,7 +48,7 @@ export function getInitializeWithdrawAtaInstructionDataSerializer(): Serializer<
 
 // Instruction.
 export function initializeWithdrawAta(
-  context: Pick<Context, 'programs'>,
+  context: Pick<Context, 'eddsa' | 'programs'>,
   input: InitializeWithdrawAtaInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
@@ -72,9 +78,28 @@ export function initializeWithdrawAta(
     );
     resolvedAccounts.tokenProgram.isWritable = false;
   }
+  if (!resolvedAccounts.withdrawAta.value) {
+    resolvedAccounts.withdrawAta.value = context.eddsa.findPda(programId, [
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.withdrawAuthority.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+    ]);
+  }
+  if (!resolvedAccounts.programConfig.value) {
+    resolvedAccounts.programConfig.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([80, 82, 79, 71, 82, 65, 77, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])),
+    ]);
+  }
+  if (!resolvedAccounts.associatedTokenProgram.value) {
+    resolvedAccounts.associatedTokenProgram.value = context.programs.getPublicKey(
+      'associatedTokenProgram',
+      'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+    );
+    resolvedAccounts.associatedTokenProgram.isWritable = false;
+  }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
-      'splSystem',
+      'systemProgram',
       '11111111111111111111111111111111'
     );
     resolvedAccounts.systemProgram.isWritable = false;

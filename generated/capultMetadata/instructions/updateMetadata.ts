@@ -72,7 +72,7 @@ export function updateMetadata(
   }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
-      'splSystem',
+      'systemProgram',
       '11111111111111111111111111111111'
     );
     resolvedAccounts.systemProgram.isWritable = false;

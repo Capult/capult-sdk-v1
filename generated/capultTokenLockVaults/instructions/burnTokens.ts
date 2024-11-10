@@ -7,14 +7,22 @@
  */
 
 import { Context, Pda, PublicKey, Signer, TransactionBuilder, transactionBuilder } from '@metaplex-foundation/umi';
-import { Serializer, bytes, mapSerializer, struct, u64, u8 } from '@metaplex-foundation/umi/serializers';
-import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners } from '../shared';
+import {
+  Serializer,
+  bytes,
+  mapSerializer,
+  publicKey as publicKeySerializer,
+  struct,
+  u64,
+  u8,
+} from '@metaplex-foundation/umi/serializers';
+import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccountMetasAndSigners } from '../shared';
 
 // Accounts.
 export type BurnTokensInstructionAccounts = {
   tokenLockVault: PublicKey | Pda;
   withdrawAuthority: Signer;
-  vaultAta: PublicKey | Pda;
+  vaultAta?: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
   tokenProgram?: PublicKey | Pda;
 };
@@ -46,7 +54,7 @@ export type BurnTokensInstructionArgs = BurnTokensInstructionDataArgs;
 
 // Instruction.
 export function burnTokens(
-  context: Pick<Context, 'programs'>,
+  context: Pick<Context, 'eddsa' | 'programs'>,
   input: BurnTokensInstructionAccounts & BurnTokensInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -74,6 +82,13 @@ export function burnTokens(
       'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
     );
     resolvedAccounts.tokenProgram.isWritable = false;
+  }
+  if (!resolvedAccounts.vaultAta.value) {
+    resolvedAccounts.vaultAta.value = context.eddsa.findPda(programId, [
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenLockVault.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+    ]);
   }
 
   // Accounts in order.

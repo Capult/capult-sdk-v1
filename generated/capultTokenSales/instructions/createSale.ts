@@ -16,8 +16,17 @@ import {
   TransactionBuilder,
   transactionBuilder,
 } from '@metaplex-foundation/umi';
-import { Serializer, bytes, mapSerializer, option, struct, u64, u8 } from '@metaplex-foundation/umi/serializers';
-import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners } from '../shared';
+import {
+  Serializer,
+  bytes,
+  mapSerializer,
+  option,
+  publicKey as publicKeySerializer,
+  struct,
+  u64,
+  u8,
+} from '@metaplex-foundation/umi/serializers';
+import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccountMetasAndSigners } from '../shared';
 import {
   AccessConfigSetup,
   AccessConfigSetupArgs,
@@ -35,17 +44,17 @@ import {
 
 // Accounts.
 export type CreateSaleInstructionAccounts = {
-  tokenSale: PublicKey | Pda;
+  tokenSale?: PublicKey | Pda;
   payer?: Signer;
   authority?: PublicKey | Pda;
   saleInitKey: PublicKey | Pda;
-  payerAta: PublicKey | Pda;
-  tokenSaleAta: PublicKey | Pda;
+  payerAta?: PublicKey | Pda;
+  tokenSaleAta?: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
   whitelistCollection?: PublicKey | Pda;
-  feeConfig: PublicKey | Pda;
+  feeConfig?: PublicKey | Pda;
   tokenProgram?: PublicKey | Pda;
-  associatedTokenProgram: PublicKey | Pda;
+  associatedTokenProgram?: PublicKey | Pda;
   systemProgram?: PublicKey | Pda;
 };
 
@@ -104,7 +113,7 @@ export type CreateSaleInstructionArgs = CreateSaleInstructionDataArgs;
 
 // Instruction.
 export function createSale(
-  context: Pick<Context, 'identity' | 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'identity' | 'payer' | 'programs'>,
   input: CreateSaleInstructionAccounts & CreateSaleInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -130,6 +139,13 @@ export function createSale(
   const resolvedArgs: CreateSaleInstructionArgs = { ...input };
 
   // Default values.
+  if (!resolvedAccounts.tokenSale.value) {
+    resolvedAccounts.tokenSale.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([67, 65, 80, 85, 76, 84, 95, 83, 69, 69, 68])),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.saleInitKey.value)),
+      bytes().serialize(new Uint8Array([84, 79, 75, 69, 78, 95, 83, 65, 76, 69, 95, 83, 69, 69, 68])),
+    ]);
+  }
   if (!resolvedAccounts.payer.value) {
     resolvedAccounts.payer.value = context.payer;
   }
@@ -143,9 +159,37 @@ export function createSale(
     );
     resolvedAccounts.tokenProgram.isWritable = false;
   }
+  if (!resolvedAccounts.payerAta.value) {
+    resolvedAccounts.payerAta.value = context.eddsa.findPda(programId, [
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.payer.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+    ]);
+  }
+  if (!resolvedAccounts.tokenSaleAta.value) {
+    resolvedAccounts.tokenSaleAta.value = context.eddsa.findPda(programId, [
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenSale.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+    ]);
+  }
+  if (!resolvedAccounts.feeConfig.value) {
+    resolvedAccounts.feeConfig.value = context.eddsa.findPda(programId, [
+      bytes().serialize(
+        new Uint8Array([83, 65, 76, 69, 83, 95, 70, 69, 69, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])
+      ),
+    ]);
+  }
+  if (!resolvedAccounts.associatedTokenProgram.value) {
+    resolvedAccounts.associatedTokenProgram.value = context.programs.getPublicKey(
+      'associatedTokenProgram',
+      'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+    );
+    resolvedAccounts.associatedTokenProgram.isWritable = false;
+  }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
-      'splSystem',
+      'systemProgram',
       '11111111111111111111111111111111'
     );
     resolvedAccounts.systemProgram.isWritable = false;

@@ -168,3 +168,36 @@ export function getEternalVaultGpaBuilder(context: Pick<Context, 'rpc' | 'progra
     .deserializeUsing<EternalVault>((account) => deserializeEternalVault(account))
     .whereField('discriminator', new Uint8Array([30, 182, 20, 105, 227, 222, 218, 182]));
 }
+
+export function findEternalVaultPda(
+  context: Pick<Context, 'eddsa' | 'programs'>,
+  seeds: {
+    vaultInitKey: PublicKey;
+  }
+): Pda {
+  const programId = context.programs.getPublicKey(
+    'capultEternalVaults',
+    'CPEVjv7pvzLceHN9auJhniU2y3divtY4PUaTvLEoxpbP'
+  );
+  return context.eddsa.findPda(programId, [
+    bytes().serialize(new Uint8Array([67, 65, 80, 85, 76, 84, 95, 83, 69, 69, 68])),
+    publicKeySerializer().serialize(seeds.vaultInitKey),
+    bytes().serialize(new Uint8Array([69, 84, 69, 82, 78, 65, 76, 95, 86, 65, 85, 76, 84, 95, 83, 69, 69, 68])),
+  ]);
+}
+
+export async function fetchEternalVaultFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  seeds: Parameters<typeof findEternalVaultPda>[1],
+  options?: RpcGetAccountOptions
+): Promise<EternalVault> {
+  return fetchEternalVault(context, findEternalVaultPda(context, seeds), options);
+}
+
+export async function safeFetchEternalVaultFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  seeds: Parameters<typeof findEternalVaultPda>[1],
+  options?: RpcGetAccountOptions
+): Promise<EternalVault | null> {
+  return safeFetchEternalVault(context, findEternalVaultPda(context, seeds), options);
+}

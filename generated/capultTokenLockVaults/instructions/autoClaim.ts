@@ -7,19 +7,26 @@
  */
 
 import { Context, Pda, PublicKey, Signer, TransactionBuilder, transactionBuilder } from '@metaplex-foundation/umi';
-import { Serializer, bool, bytes, mapSerializer, struct } from '@metaplex-foundation/umi/serializers';
-import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners } from '../shared';
+import {
+  Serializer,
+  bool,
+  bytes,
+  mapSerializer,
+  publicKey as publicKeySerializer,
+  struct,
+} from '@metaplex-foundation/umi/serializers';
+import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccountMetasAndSigners } from '../shared';
 
 // Accounts.
 export type AutoClaimInstructionAccounts = {
   tokenLockVault: PublicKey | Pda;
   claimInitiator: Signer;
-  vaultAta: PublicKey | Pda;
-  toAta: PublicKey | Pda;
+  vaultAta?: PublicKey | Pda;
+  recipientAta: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
-  programConfig: PublicKey | Pda;
+  programConfig?: PublicKey | Pda;
   tokenProgram?: PublicKey | Pda;
-  associatedTokenProgram: PublicKey | Pda;
+  associatedTokenProgram?: PublicKey | Pda;
 };
 
 // Data.
@@ -48,7 +55,7 @@ export type AutoClaimInstructionArgs = AutoClaimInstructionDataArgs;
 
 // Instruction.
 export function autoClaim(
-  context: Pick<Context, 'programs'>,
+  context: Pick<Context, 'eddsa' | 'programs'>,
   input: AutoClaimInstructionAccounts & AutoClaimInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -62,7 +69,7 @@ export function autoClaim(
     tokenLockVault: { index: 0, isWritable: true as boolean, value: input.tokenLockVault ?? null },
     claimInitiator: { index: 1, isWritable: true as boolean, value: input.claimInitiator ?? null },
     vaultAta: { index: 2, isWritable: true as boolean, value: input.vaultAta ?? null },
-    toAta: { index: 3, isWritable: true as boolean, value: input.toAta ?? null },
+    recipientAta: { index: 3, isWritable: true as boolean, value: input.recipientAta ?? null },
     tokenMint: { index: 4, isWritable: false as boolean, value: input.tokenMint ?? null },
     programConfig: { index: 5, isWritable: false as boolean, value: input.programConfig ?? null },
     tokenProgram: { index: 6, isWritable: false as boolean, value: input.tokenProgram ?? null },
@@ -79,6 +86,25 @@ export function autoClaim(
       'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
     );
     resolvedAccounts.tokenProgram.isWritable = false;
+  }
+  if (!resolvedAccounts.vaultAta.value) {
+    resolvedAccounts.vaultAta.value = context.eddsa.findPda(programId, [
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenLockVault.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+    ]);
+  }
+  if (!resolvedAccounts.programConfig.value) {
+    resolvedAccounts.programConfig.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([80, 82, 79, 71, 82, 65, 77, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])),
+    ]);
+  }
+  if (!resolvedAccounts.associatedTokenProgram.value) {
+    resolvedAccounts.associatedTokenProgram.value = context.programs.getPublicKey(
+      'associatedTokenProgram',
+      'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+    );
+    resolvedAccounts.associatedTokenProgram.isWritable = false;
   }
 
   // Accounts in order.

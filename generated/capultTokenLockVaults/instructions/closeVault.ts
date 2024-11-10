@@ -13,7 +13,7 @@ import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners
 // Accounts.
 export type CloseVaultInstructionAccounts = {
   tokenLockVault: PublicKey | Pda;
-  programConfig: PublicKey | Pda;
+  programConfig?: PublicKey | Pda;
   feeWithdrawAuthority: PublicKey | Pda;
   withdrawAuthority: Signer;
   recipient: PublicKey | Pda;
@@ -41,7 +41,7 @@ export function getCloseVaultInstructionDataSerializer(): Serializer<
 
 // Instruction.
 export function closeVault(
-  context: Pick<Context, 'programs'>,
+  context: Pick<Context, 'eddsa' | 'programs'>,
   input: CloseVaultInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
@@ -63,6 +63,11 @@ export function closeVault(
   } satisfies ResolvedAccountsWithIndices;
 
   // Default values.
+  if (!resolvedAccounts.programConfig.value) {
+    resolvedAccounts.programConfig.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([80, 82, 79, 71, 82, 65, 77, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])),
+    ]);
+  }
   if (!resolvedAccounts.tokenProgram.value) {
     resolvedAccounts.tokenProgram.value = context.programs.getPublicKey(
       'splToken',

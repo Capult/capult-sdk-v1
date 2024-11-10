@@ -16,21 +16,31 @@ import {
   TransactionBuilder,
   transactionBuilder,
 } from '@metaplex-foundation/umi';
-import { Serializer, array, bytes, mapSerializer, option, struct, u64, u8 } from '@metaplex-foundation/umi/serializers';
-import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners } from '../shared';
+import {
+  Serializer,
+  array,
+  bytes,
+  mapSerializer,
+  option,
+  publicKey as publicKeySerializer,
+  struct,
+  u64,
+  u8,
+} from '@metaplex-foundation/umi/serializers';
+import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccountMetasAndSigners } from '../shared';
 
 // Accounts.
 export type BuyTokensInstructionAccounts = {
   tokenSale: PublicKey | Pda;
-  purchaseRecord: PublicKey | Pda;
+  purchaseRecord?: PublicKey | Pda;
   payer?: Signer;
   recipient: PublicKey | Pda;
-  tokenSaleAta: PublicKey | Pda;
+  tokenSaleAta?: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
   whitelistToken?: PublicKey | Pda;
   whitelistTokenCollection?: PublicKey | Pda;
   mplCoreProgram?: PublicKey | Pda;
-  feeConfig: PublicKey | Pda;
+  feeConfig?: PublicKey | Pda;
   tokenProgram?: PublicKey | Pda;
   systemProgram?: PublicKey | Pda;
 };
@@ -75,7 +85,7 @@ export type BuyTokensInstructionArgs = BuyTokensInstructionDataArgs;
 
 // Instruction.
 export function buyTokens(
-  context: Pick<Context, 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'payer' | 'programs'>,
   input: BuyTokensInstructionAccounts & BuyTokensInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -101,6 +111,16 @@ export function buyTokens(
   const resolvedArgs: BuyTokensInstructionArgs = { ...input };
 
   // Default values.
+  if (!resolvedAccounts.purchaseRecord.value) {
+    resolvedAccounts.purchaseRecord.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([67, 65, 80, 85, 76, 84, 95, 83, 69, 69, 68])),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.recipient.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenSale.value)),
+      bytes().serialize(
+        new Uint8Array([80, 85, 82, 67, 72, 65, 83, 69, 95, 82, 69, 67, 79, 82, 68, 95, 83, 69, 69, 68])
+      ),
+    ]);
+  }
   if (!resolvedAccounts.payer.value) {
     resolvedAccounts.payer.value = context.payer;
   }
@@ -111,9 +131,30 @@ export function buyTokens(
     );
     resolvedAccounts.tokenProgram.isWritable = false;
   }
+  if (!resolvedAccounts.tokenSaleAta.value) {
+    resolvedAccounts.tokenSaleAta.value = context.eddsa.findPda(programId, [
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenSale.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+    ]);
+  }
+  if (!resolvedAccounts.mplCoreProgram.value) {
+    resolvedAccounts.mplCoreProgram.value = context.programs.getPublicKey(
+      'mplCoreProgram',
+      'CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d'
+    );
+    resolvedAccounts.mplCoreProgram.isWritable = false;
+  }
+  if (!resolvedAccounts.feeConfig.value) {
+    resolvedAccounts.feeConfig.value = context.eddsa.findPda(programId, [
+      bytes().serialize(
+        new Uint8Array([83, 65, 76, 69, 83, 95, 70, 69, 69, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])
+      ),
+    ]);
+  }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
-      'splSystem',
+      'systemProgram',
       '11111111111111111111111111111111'
     );
     resolvedAccounts.systemProgram.isWritable = false;

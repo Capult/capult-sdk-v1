@@ -160,3 +160,27 @@ export function getProgramConfigGpaBuilder(context: Pick<Context, 'rpc' | 'progr
     .deserializeUsing<ProgramConfig>((account) => deserializeProgramConfig(account))
     .whereField('discriminator', new Uint8Array([196, 210, 90, 231, 144, 149, 140, 63]));
 }
+
+export function findProgramConfigPda(context: Pick<Context, 'eddsa' | 'programs'>): Pda {
+  const programId = context.programs.getPublicKey(
+    'capultTokenLockVaults',
+    'CPTLVeSKEXbPNZ4WnHTTGBX4J2uV3ktv3YkL9i7wSPwC'
+  );
+  return context.eddsa.findPda(programId, [
+    bytes().serialize(new Uint8Array([80, 82, 79, 71, 82, 65, 77, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])),
+  ]);
+}
+
+export async function fetchProgramConfigFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  options?: RpcGetAccountOptions
+): Promise<ProgramConfig> {
+  return fetchProgramConfig(context, findProgramConfigPda(context), options);
+}
+
+export async function safeFetchProgramConfigFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  options?: RpcGetAccountOptions
+): Promise<ProgramConfig | null> {
+  return safeFetchProgramConfig(context, findProgramConfigPda(context), options);
+}

@@ -145,3 +145,36 @@ export function getPurchaseRecordGpaBuilder(context: Pick<Context, 'rpc' | 'prog
 export function getPurchaseRecordSize(): number {
   return 89;
 }
+
+export function findPurchaseRecordPda(
+  context: Pick<Context, 'eddsa' | 'programs'>,
+  seeds: {
+    authority: PublicKey;
+
+    tokenSale: PublicKey;
+  }
+): Pda {
+  const programId = context.programs.getPublicKey('capultTokenSales', 'CPTSoDzrvBad8fW2DWRgXhb2R5pa8sVdBJvZhfhuyYKe');
+  return context.eddsa.findPda(programId, [
+    bytes().serialize(new Uint8Array([67, 65, 80, 85, 76, 84, 95, 83, 69, 69, 68])),
+    publicKeySerializer().serialize(seeds.authority),
+    publicKeySerializer().serialize(seeds.tokenSale),
+    bytes().serialize(new Uint8Array([80, 85, 82, 67, 72, 65, 83, 69, 95, 82, 69, 67, 79, 82, 68, 95, 83, 69, 69, 68])),
+  ]);
+}
+
+export async function fetchPurchaseRecordFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  seeds: Parameters<typeof findPurchaseRecordPda>[1],
+  options?: RpcGetAccountOptions
+): Promise<PurchaseRecord> {
+  return fetchPurchaseRecord(context, findPurchaseRecordPda(context, seeds), options);
+}
+
+export async function safeFetchPurchaseRecordFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  seeds: Parameters<typeof findPurchaseRecordPda>[1],
+  options?: RpcGetAccountOptions
+): Promise<PurchaseRecord | null> {
+  return safeFetchPurchaseRecord(context, findPurchaseRecordPda(context, seeds), options);
+}

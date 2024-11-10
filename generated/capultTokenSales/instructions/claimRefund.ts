@@ -7,12 +7,19 @@
  */
 
 import { Context, Pda, PublicKey, Signer, TransactionBuilder, transactionBuilder } from '@metaplex-foundation/umi';
-import { Serializer, bytes, mapSerializer, struct, u64 } from '@metaplex-foundation/umi/serializers';
-import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners } from '../shared';
+import {
+  Serializer,
+  bytes,
+  mapSerializer,
+  publicKey as publicKeySerializer,
+  struct,
+  u64,
+} from '@metaplex-foundation/umi/serializers';
+import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccountMetasAndSigners } from '../shared';
 
 // Accounts.
 export type ClaimRefundInstructionAccounts = {
-  purchaseRecord: PublicKey | Pda;
+  purchaseRecord?: PublicKey | Pda;
   tokenSale: PublicKey | Pda;
   payer?: Signer;
   authority?: Signer;
@@ -46,7 +53,7 @@ export type ClaimRefundInstructionArgs = ClaimRefundInstructionDataArgs;
 
 // Instruction.
 export function claimRefund(
-  context: Pick<Context, 'identity' | 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'identity' | 'payer' | 'programs'>,
   input: ClaimRefundInstructionAccounts & ClaimRefundInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -66,15 +73,25 @@ export function claimRefund(
   const resolvedArgs: ClaimRefundInstructionArgs = { ...input };
 
   // Default values.
-  if (!resolvedAccounts.payer.value) {
-    resolvedAccounts.payer.value = context.payer;
-  }
   if (!resolvedAccounts.authority.value) {
     resolvedAccounts.authority.value = context.identity;
   }
+  if (!resolvedAccounts.purchaseRecord.value) {
+    resolvedAccounts.purchaseRecord.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([67, 65, 80, 85, 76, 84, 95, 83, 69, 69, 68])),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.authority.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenSale.value)),
+      bytes().serialize(
+        new Uint8Array([80, 85, 82, 67, 72, 65, 83, 69, 95, 82, 69, 67, 79, 82, 68, 95, 83, 69, 69, 68])
+      ),
+    ]);
+  }
+  if (!resolvedAccounts.payer.value) {
+    resolvedAccounts.payer.value = context.payer;
+  }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
-      'splSystem',
+      'systemProgram',
       '11111111111111111111111111111111'
     );
     resolvedAccounts.systemProgram.isWritable = false;

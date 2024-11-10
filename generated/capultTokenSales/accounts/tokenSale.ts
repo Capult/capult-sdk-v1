@@ -213,3 +213,33 @@ export function getTokenSaleGpaBuilder(context: Pick<Context, 'rpc' | 'programs'
     .deserializeUsing<TokenSale>((account) => deserializeTokenSale(account))
     .whereField('discriminator', new Uint8Array([124, 108, 99, 6, 247, 132, 120, 233]));
 }
+
+export function findTokenSalePda(
+  context: Pick<Context, 'eddsa' | 'programs'>,
+  seeds: {
+    saleInitKey: PublicKey;
+  }
+): Pda {
+  const programId = context.programs.getPublicKey('capultTokenSales', 'CPTSoDzrvBad8fW2DWRgXhb2R5pa8sVdBJvZhfhuyYKe');
+  return context.eddsa.findPda(programId, [
+    bytes().serialize(new Uint8Array([67, 65, 80, 85, 76, 84, 95, 83, 69, 69, 68])),
+    publicKeySerializer().serialize(seeds.saleInitKey),
+    bytes().serialize(new Uint8Array([84, 79, 75, 69, 78, 95, 83, 65, 76, 69, 95, 83, 69, 69, 68])),
+  ]);
+}
+
+export async function fetchTokenSaleFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  seeds: Parameters<typeof findTokenSalePda>[1],
+  options?: RpcGetAccountOptions
+): Promise<TokenSale> {
+  return fetchTokenSale(context, findTokenSalePda(context, seeds), options);
+}
+
+export async function safeFetchTokenSaleFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  seeds: Parameters<typeof findTokenSalePda>[1],
+  options?: RpcGetAccountOptions
+): Promise<TokenSale | null> {
+  return safeFetchTokenSale(context, findTokenSalePda(context, seeds), options);
+}

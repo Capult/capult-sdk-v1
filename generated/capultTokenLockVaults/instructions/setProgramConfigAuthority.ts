@@ -13,7 +13,7 @@ import { ConfigAuthorityType, ConfigAuthorityTypeArgs, getConfigAuthorityTypeSer
 
 // Accounts.
 export type SetProgramConfigAuthorityInstructionAccounts = {
-  programConfig: PublicKey | Pda;
+  programConfig?: PublicKey | Pda;
   authority?: Signer;
   newAuthority?: PublicKey | Pda;
 };
@@ -47,7 +47,7 @@ export type SetProgramConfigAuthorityInstructionArgs = SetProgramConfigAuthority
 
 // Instruction.
 export function setProgramConfigAuthority(
-  context: Pick<Context, 'identity' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'identity' | 'programs'>,
   input: SetProgramConfigAuthorityInstructionAccounts & SetProgramConfigAuthorityInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -67,6 +67,11 @@ export function setProgramConfigAuthority(
   const resolvedArgs: SetProgramConfigAuthorityInstructionArgs = { ...input };
 
   // Default values.
+  if (!resolvedAccounts.programConfig.value) {
+    resolvedAccounts.programConfig.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([80, 82, 79, 71, 82, 65, 77, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])),
+    ]);
+  }
   if (!resolvedAccounts.authority.value) {
     resolvedAccounts.authority.value = context.identity;
   }

@@ -12,7 +12,7 @@ import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners
 
 // Accounts.
 export type SetFeeConfigInstructionAccounts = {
-  feeConfig: PublicKey | Pda;
+  feeConfig?: PublicKey | Pda;
   newWithdrawAuthority: PublicKey | Pda;
   authority?: Signer;
 };
@@ -57,7 +57,7 @@ export type SetFeeConfigInstructionArgs = SetFeeConfigInstructionDataArgs;
 
 // Instruction.
 export function setFeeConfig(
-  context: Pick<Context, 'identity' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'identity' | 'programs'>,
   input: SetFeeConfigInstructionAccounts & SetFeeConfigInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -74,6 +74,13 @@ export function setFeeConfig(
   const resolvedArgs: SetFeeConfigInstructionArgs = { ...input };
 
   // Default values.
+  if (!resolvedAccounts.feeConfig.value) {
+    resolvedAccounts.feeConfig.value = context.eddsa.findPda(programId, [
+      bytes().serialize(
+        new Uint8Array([83, 65, 76, 69, 83, 95, 70, 69, 69, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])
+      ),
+    ]);
+  }
   if (!resolvedAccounts.authority.value) {
     resolvedAccounts.authority.value = context.identity;
   }

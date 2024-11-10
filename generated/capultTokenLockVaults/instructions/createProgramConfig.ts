@@ -12,10 +12,10 @@ import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners
 
 // Accounts.
 export type CreateProgramConfigInstructionAccounts = {
-  programConfig: PublicKey | Pda;
+  programConfig?: PublicKey | Pda;
   payer?: Signer;
   authority?: PublicKey | Pda;
-  program: PublicKey | Pda;
+  program?: PublicKey | Pda;
   programData: PublicKey | Pda;
   feeWithdrawAuthority: PublicKey | Pda;
   systemProgram?: PublicKey | Pda;
@@ -58,7 +58,7 @@ export type CreateProgramConfigInstructionArgs = CreateProgramConfigInstructionD
 
 // Instruction.
 export function createProgramConfig(
-  context: Pick<Context, 'identity' | 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'identity' | 'payer' | 'programs'>,
   input: CreateProgramConfigInstructionAccounts & CreateProgramConfigInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -82,15 +82,27 @@ export function createProgramConfig(
   const resolvedArgs: CreateProgramConfigInstructionArgs = { ...input };
 
   // Default values.
+  if (!resolvedAccounts.programConfig.value) {
+    resolvedAccounts.programConfig.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([80, 82, 79, 71, 82, 65, 77, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])),
+    ]);
+  }
   if (!resolvedAccounts.payer.value) {
     resolvedAccounts.payer.value = context.payer;
   }
   if (!resolvedAccounts.authority.value) {
     resolvedAccounts.authority.value = context.identity.publicKey;
   }
+  if (!resolvedAccounts.program.value) {
+    resolvedAccounts.program.value = context.programs.getPublicKey(
+      'program',
+      'CPTLVeSKEXbPNZ4WnHTTGBX4J2uV3ktv3YkL9i7wSPwC'
+    );
+    resolvedAccounts.program.isWritable = false;
+  }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
-      'splSystem',
+      'systemProgram',
       '11111111111111111111111111111111'
     );
     resolvedAccounts.systemProgram.isWritable = false;

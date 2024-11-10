@@ -7,14 +7,23 @@
  */
 
 import { Context, Pda, PublicKey, Signer, TransactionBuilder, transactionBuilder } from '@metaplex-foundation/umi';
-import { Serializer, bytes, i64, mapSerializer, struct, u64, u8 } from '@metaplex-foundation/umi/serializers';
-import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners } from '../shared';
+import {
+  Serializer,
+  bytes,
+  i64,
+  mapSerializer,
+  publicKey as publicKeySerializer,
+  struct,
+  u64,
+  u8,
+} from '@metaplex-foundation/umi/serializers';
+import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccountMetasAndSigners } from '../shared';
 
 // Accounts.
 export type InitiateUnlockInstructionAccounts = {
   eternalVault: PublicKey | Pda;
   authority?: Signer;
-  vaultAta: PublicKey | Pda;
+  vaultAta?: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
   tokenProgram?: PublicKey | Pda;
 };
@@ -56,7 +65,7 @@ export type InitiateUnlockInstructionArgs = InitiateUnlockInstructionDataArgs;
 
 // Instruction.
 export function initiateUnlock(
-  context: Pick<Context, 'identity' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'identity' | 'programs'>,
   input: InitiateUnlockInstructionAccounts & InitiateUnlockInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -87,6 +96,13 @@ export function initiateUnlock(
       'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
     );
     resolvedAccounts.tokenProgram.isWritable = false;
+  }
+  if (!resolvedAccounts.vaultAta.value) {
+    resolvedAccounts.vaultAta.value = context.eddsa.findPda(programId, [
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.eternalVault.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+    ]);
   }
 
   // Accounts in order.

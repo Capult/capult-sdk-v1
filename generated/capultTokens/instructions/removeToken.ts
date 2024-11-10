@@ -7,12 +7,18 @@
  */
 
 import { Context, Pda, PublicKey, Signer, TransactionBuilder, transactionBuilder } from '@metaplex-foundation/umi';
-import { Serializer, bytes, mapSerializer, struct } from '@metaplex-foundation/umi/serializers';
-import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners } from '../shared';
+import {
+  Serializer,
+  bytes,
+  mapSerializer,
+  publicKey as publicKeySerializer,
+  struct,
+} from '@metaplex-foundation/umi/serializers';
+import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccountMetasAndSigners } from '../shared';
 
 // Accounts.
 export type RemoveTokenInstructionAccounts = {
-  tokenDetails: PublicKey | Pda;
+  tokenDetails?: PublicKey | Pda;
   authority?: Signer;
   tokenMint: PublicKey | Pda;
 };
@@ -36,7 +42,7 @@ export function getRemoveTokenInstructionDataSerializer(): Serializer<
 
 // Instruction.
 export function removeToken(
-  context: Pick<Context, 'identity' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'identity' | 'programs'>,
   input: RemoveTokenInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
@@ -52,6 +58,17 @@ export function removeToken(
   // Default values.
   if (!resolvedAccounts.authority.value) {
     resolvedAccounts.authority.value = context.identity;
+  }
+  if (!resolvedAccounts.tokenDetails.value) {
+    resolvedAccounts.tokenDetails.value = context.eddsa.findPda(programId, [
+      bytes().serialize(
+        new Uint8Array([
+          67, 65, 80, 85, 76, 84, 95, 84, 79, 75, 69, 78, 95, 68, 69, 84, 65, 73, 76, 83, 95, 83, 69, 69, 68,
+        ])
+      ),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.authority.value)),
+    ]);
   }
 
   // Accounts in order.

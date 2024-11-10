@@ -181,3 +181,38 @@ export function getTokenLockVaultGpaBuilder(context: Pick<Context, 'rpc' | 'prog
     .deserializeUsing<TokenLockVault>((account) => deserializeTokenLockVault(account))
     .whereField('discriminator', new Uint8Array([68, 170, 38, 203, 120, 109, 181, 189]));
 }
+
+export function findTokenLockVaultPda(
+  context: Pick<Context, 'eddsa' | 'programs'>,
+  seeds: {
+    vaultInitKey: PublicKey;
+  }
+): Pda {
+  const programId = context.programs.getPublicKey(
+    'capultTokenLockVaults',
+    'CPTLVeSKEXbPNZ4WnHTTGBX4J2uV3ktv3YkL9i7wSPwC'
+  );
+  return context.eddsa.findPda(programId, [
+    bytes().serialize(new Uint8Array([67, 65, 80, 85, 76, 84, 95, 83, 69, 69, 68])),
+    publicKeySerializer().serialize(seeds.vaultInitKey),
+    bytes().serialize(
+      new Uint8Array([84, 79, 75, 69, 78, 95, 76, 79, 67, 75, 95, 86, 65, 85, 76, 84, 95, 83, 69, 69, 68])
+    ),
+  ]);
+}
+
+export async function fetchTokenLockVaultFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  seeds: Parameters<typeof findTokenLockVaultPda>[1],
+  options?: RpcGetAccountOptions
+): Promise<TokenLockVault> {
+  return fetchTokenLockVault(context, findTokenLockVaultPda(context, seeds), options);
+}
+
+export async function safeFetchTokenLockVaultFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  seeds: Parameters<typeof findTokenLockVaultPda>[1],
+  options?: RpcGetAccountOptions
+): Promise<TokenLockVault | null> {
+  return safeFetchTokenLockVault(context, findTokenLockVaultPda(context, seeds), options);
+}

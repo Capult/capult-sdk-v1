@@ -16,20 +16,29 @@ import {
   TransactionBuilder,
   transactionBuilder,
 } from '@metaplex-foundation/umi';
-import { Serializer, bytes, mapSerializer, option, struct, u64, u8 } from '@metaplex-foundation/umi/serializers';
-import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners } from '../shared';
+import {
+  Serializer,
+  bytes,
+  mapSerializer,
+  option,
+  publicKey as publicKeySerializer,
+  struct,
+  u64,
+  u8,
+} from '@metaplex-foundation/umi/serializers';
+import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccountMetasAndSigners } from '../shared';
 
 // Accounts.
 export type WithdrawTokensInstructionAccounts = {
   tokenLockVault: PublicKey | Pda;
   withdrawAuthority: Signer;
   payer?: Signer;
-  vaultAta: PublicKey | Pda;
-  ataAuthority: PublicKey | Pda;
-  toAta: PublicKey | Pda;
+  vaultAta?: PublicKey | Pda;
+  recipient: PublicKey | Pda;
+  recipientAta?: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
   tokenProgram?: PublicKey | Pda;
-  associatedTokenProgram: PublicKey | Pda;
+  associatedTokenProgram?: PublicKey | Pda;
   systemProgram?: PublicKey | Pda;
 };
 
@@ -70,7 +79,7 @@ export type WithdrawTokensInstructionArgs = WithdrawTokensInstructionDataArgs;
 
 // Instruction.
 export function withdrawTokens(
-  context: Pick<Context, 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'payer' | 'programs'>,
   input: WithdrawTokensInstructionAccounts & WithdrawTokensInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -85,8 +94,8 @@ export function withdrawTokens(
     withdrawAuthority: { index: 1, isWritable: false as boolean, value: input.withdrawAuthority ?? null },
     payer: { index: 2, isWritable: true as boolean, value: input.payer ?? null },
     vaultAta: { index: 3, isWritable: true as boolean, value: input.vaultAta ?? null },
-    ataAuthority: { index: 4, isWritable: false as boolean, value: input.ataAuthority ?? null },
-    toAta: { index: 5, isWritable: true as boolean, value: input.toAta ?? null },
+    recipient: { index: 4, isWritable: false as boolean, value: input.recipient ?? null },
+    recipientAta: { index: 5, isWritable: true as boolean, value: input.recipientAta ?? null },
     tokenMint: { index: 6, isWritable: false as boolean, value: input.tokenMint ?? null },
     tokenProgram: { index: 7, isWritable: false as boolean, value: input.tokenProgram ?? null },
     associatedTokenProgram: { index: 8, isWritable: false as boolean, value: input.associatedTokenProgram ?? null },
@@ -107,9 +116,30 @@ export function withdrawTokens(
     );
     resolvedAccounts.tokenProgram.isWritable = false;
   }
+  if (!resolvedAccounts.vaultAta.value) {
+    resolvedAccounts.vaultAta.value = context.eddsa.findPda(programId, [
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenLockVault.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+    ]);
+  }
+  if (!resolvedAccounts.recipientAta.value) {
+    resolvedAccounts.recipientAta.value = context.eddsa.findPda(programId, [
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.recipient.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+    ]);
+  }
+  if (!resolvedAccounts.associatedTokenProgram.value) {
+    resolvedAccounts.associatedTokenProgram.value = context.programs.getPublicKey(
+      'associatedTokenProgram',
+      'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+    );
+    resolvedAccounts.associatedTokenProgram.isWritable = false;
+  }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
-      'splSystem',
+      'systemProgram',
       '11111111111111111111111111111111'
     );
     resolvedAccounts.systemProgram.isWritable = false;

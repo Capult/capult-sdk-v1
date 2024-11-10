@@ -16,25 +16,34 @@ import {
   TransactionBuilder,
   transactionBuilder,
 } from '@metaplex-foundation/umi';
-import { Serializer, bytes, mapSerializer, option, struct, u64, u8 } from '@metaplex-foundation/umi/serializers';
-import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners } from '../shared';
+import {
+  Serializer,
+  bytes,
+  mapSerializer,
+  option,
+  publicKey as publicKeySerializer,
+  struct,
+  u64,
+  u8,
+} from '@metaplex-foundation/umi/serializers';
+import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccountMetasAndSigners } from '../shared';
 import { AutoClaimSetupArgs, AutoClaimSetupArgsArgs, getAutoClaimSetupArgsSerializer } from '../types';
 
 // Accounts.
 export type ClaimTokensToTlvInstructionAccounts = {
-  purchaseRecord: PublicKey | Pda;
+  purchaseRecord?: PublicKey | Pda;
   tokenSale: PublicKey | Pda;
   payer?: Signer;
   authority?: Signer;
   tokenLockVault: PublicKey | Pda;
   tlvInitKey: PublicKey | Pda;
   tokenLockVaultsProgramConfig: PublicKey | Pda;
-  tokenSaleAta: PublicKey | Pda;
-  tlvAta: PublicKey | Pda;
+  tokenSaleAta?: PublicKey | Pda;
+  tlvAta?: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
-  tokenLockVaultsProgram: PublicKey | Pda;
+  tokenLockVaultsProgram?: PublicKey | Pda;
   tokenProgram?: PublicKey | Pda;
-  associatedTokenProgram: PublicKey | Pda;
+  associatedTokenProgram?: PublicKey | Pda;
   systemProgram?: PublicKey | Pda;
 };
 
@@ -78,7 +87,7 @@ export type ClaimTokensToTlvInstructionArgs = ClaimTokensToTlvInstructionDataArg
 
 // Instruction.
 export function claimTokensToTlv(
-  context: Pick<Context, 'identity' | 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'identity' | 'payer' | 'programs'>,
   input: ClaimTokensToTlvInstructionAccounts & ClaimTokensToTlvInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -110,11 +119,21 @@ export function claimTokensToTlv(
   const resolvedArgs: ClaimTokensToTlvInstructionArgs = { ...input };
 
   // Default values.
-  if (!resolvedAccounts.payer.value) {
-    resolvedAccounts.payer.value = context.payer;
-  }
   if (!resolvedAccounts.authority.value) {
     resolvedAccounts.authority.value = context.identity;
+  }
+  if (!resolvedAccounts.purchaseRecord.value) {
+    resolvedAccounts.purchaseRecord.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([67, 65, 80, 85, 76, 84, 95, 83, 69, 69, 68])),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.authority.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenSale.value)),
+      bytes().serialize(
+        new Uint8Array([80, 85, 82, 67, 72, 65, 83, 69, 95, 82, 69, 67, 79, 82, 68, 95, 83, 69, 69, 68])
+      ),
+    ]);
+  }
+  if (!resolvedAccounts.payer.value) {
+    resolvedAccounts.payer.value = context.payer;
   }
   if (!resolvedAccounts.tokenProgram.value) {
     resolvedAccounts.tokenProgram.value = context.programs.getPublicKey(
@@ -123,9 +142,37 @@ export function claimTokensToTlv(
     );
     resolvedAccounts.tokenProgram.isWritable = false;
   }
+  if (!resolvedAccounts.tokenSaleAta.value) {
+    resolvedAccounts.tokenSaleAta.value = context.eddsa.findPda(programId, [
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenSale.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+    ]);
+  }
+  if (!resolvedAccounts.tlvAta.value) {
+    resolvedAccounts.tlvAta.value = context.eddsa.findPda(programId, [
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenLockVault.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
+    ]);
+  }
+  if (!resolvedAccounts.tokenLockVaultsProgram.value) {
+    resolvedAccounts.tokenLockVaultsProgram.value = context.programs.getPublicKey(
+      'tokenLockVaultsProgram',
+      'CPTLVeSKEXbPNZ4WnHTTGBX4J2uV3ktv3YkL9i7wSPwC'
+    );
+    resolvedAccounts.tokenLockVaultsProgram.isWritable = false;
+  }
+  if (!resolvedAccounts.associatedTokenProgram.value) {
+    resolvedAccounts.associatedTokenProgram.value = context.programs.getPublicKey(
+      'associatedTokenProgram',
+      'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+    );
+    resolvedAccounts.associatedTokenProgram.isWritable = false;
+  }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
-      'splSystem',
+      'systemProgram',
       '11111111111111111111111111111111'
     );
     resolvedAccounts.systemProgram.isWritable = false;

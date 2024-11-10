@@ -145,3 +145,27 @@ export function getFeeConfigGpaBuilder(context: Pick<Context, 'rpc' | 'programs'
     .deserializeUsing<FeeConfig>((account) => deserializeFeeConfig(account))
     .whereField('discriminator', new Uint8Array([143, 52, 146, 187, 219, 123, 76, 155]));
 }
+
+export function findFeeConfigPda(context: Pick<Context, 'eddsa' | 'programs'>): Pda {
+  const programId = context.programs.getPublicKey(
+    'capultEternalVaults',
+    'CPEVjv7pvzLceHN9auJhniU2y3divtY4PUaTvLEoxpbP'
+  );
+  return context.eddsa.findPda(programId, [
+    bytes().serialize(new Uint8Array([70, 69, 69, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])),
+  ]);
+}
+
+export async function fetchFeeConfigFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  options?: RpcGetAccountOptions
+): Promise<FeeConfig> {
+  return fetchFeeConfig(context, findFeeConfigPda(context), options);
+}
+
+export async function safeFetchFeeConfigFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  options?: RpcGetAccountOptions
+): Promise<FeeConfig | null> {
+  return safeFetchFeeConfig(context, findFeeConfigPda(context), options);
+}

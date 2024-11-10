@@ -16,7 +16,7 @@ export type CollectFeesInstructionAccounts = {
   payer?: Signer;
   withdrawAuthority: Signer;
   recipient: PublicKey | Pda;
-  feeConfig: PublicKey | Pda;
+  feeConfig?: PublicKey | Pda;
   systemProgram?: PublicKey | Pda;
 };
 
@@ -46,7 +46,7 @@ export type CollectFeesInstructionArgs = CollectFeesInstructionDataArgs;
 
 // Instruction.
 export function collectFees(
-  context: Pick<Context, 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'payer' | 'programs'>,
   input: CollectFeesInstructionAccounts & CollectFeesInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -69,9 +69,16 @@ export function collectFees(
   if (!resolvedAccounts.payer.value) {
     resolvedAccounts.payer.value = context.payer;
   }
+  if (!resolvedAccounts.feeConfig.value) {
+    resolvedAccounts.feeConfig.value = context.eddsa.findPda(programId, [
+      bytes().serialize(
+        new Uint8Array([83, 65, 76, 69, 83, 95, 70, 69, 69, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])
+      ),
+    ]);
+  }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
-      'splSystem',
+      'systemProgram',
       '11111111111111111111111111111111'
     );
     resolvedAccounts.systemProgram.isWritable = false;

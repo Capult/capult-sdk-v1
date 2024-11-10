@@ -31,16 +31,16 @@ import {
 
 export type Metadata = Account<MetadataAccountData>;
 
-export type MetadataAccountData = { discriminator: Uint8Array; metadataOwner: PublicKey; bump: number; url: string };
+export type MetadataAccountData = { discriminator: Uint8Array; capultOwnedPda: PublicKey; bump: number; url: string };
 
-export type MetadataAccountDataArgs = { metadataOwner: PublicKey; bump: number; url: string };
+export type MetadataAccountDataArgs = { capultOwnedPda: PublicKey; bump: number; url: string };
 
 export function getMetadataAccountDataSerializer(): Serializer<MetadataAccountDataArgs, MetadataAccountData> {
   return mapSerializer<MetadataAccountDataArgs, any, MetadataAccountData>(
     struct<MetadataAccountData>(
       [
         ['discriminator', bytes({ size: 8 })],
-        ['metadataOwner', publicKeySerializer()],
+        ['capultOwnedPda', publicKeySerializer()],
         ['bump', u8()],
         ['url', string()],
       ],
@@ -105,12 +105,42 @@ export async function safeFetchAllMetadata(
 export function getMetadataGpaBuilder(context: Pick<Context, 'rpc' | 'programs'>) {
   const programId = context.programs.getPublicKey('capultMetadata', 'CPMDk1zycejhBAPLUiCrYfQWDD5Kdi19zzM4s1ts6EkQ');
   return gpaBuilder(context, programId)
-    .registerFields<{ discriminator: Uint8Array; metadataOwner: PublicKey; bump: number; url: string }>({
+    .registerFields<{ discriminator: Uint8Array; capultOwnedPda: PublicKey; bump: number; url: string }>({
       discriminator: [0, bytes({ size: 8 })],
-      metadataOwner: [8, publicKeySerializer()],
+      capultOwnedPda: [8, publicKeySerializer()],
       bump: [40, u8()],
       url: [41, string()],
     })
     .deserializeUsing<Metadata>((account) => deserializeMetadata(account))
     .whereField('discriminator', new Uint8Array([72, 11, 121, 26, 111, 181, 85, 93]));
+}
+
+export function findMetadataPda(
+  context: Pick<Context, 'eddsa' | 'programs'>,
+  seeds: {
+    capultOwnedPda: PublicKey;
+  }
+): Pda {
+  const programId = context.programs.getPublicKey('capultMetadata', 'CPMDk1zycejhBAPLUiCrYfQWDD5Kdi19zzM4s1ts6EkQ');
+  return context.eddsa.findPda(programId, [
+    bytes().serialize(new Uint8Array([67, 65, 80, 85, 76, 84, 95, 83, 69, 69, 68])),
+    publicKeySerializer().serialize(seeds.capultOwnedPda),
+    bytes().serialize(new Uint8Array([77, 69, 84, 65, 68, 65, 84, 65, 95, 83, 69, 69, 68])),
+  ]);
+}
+
+export async function fetchMetadataFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  seeds: Parameters<typeof findMetadataPda>[1],
+  options?: RpcGetAccountOptions
+): Promise<Metadata> {
+  return fetchMetadata(context, findMetadataPda(context, seeds), options);
+}
+
+export async function safeFetchMetadataFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  seeds: Parameters<typeof findMetadataPda>[1],
+  options?: RpcGetAccountOptions
+): Promise<Metadata | null> {
+  return safeFetchMetadata(context, findMetadataPda(context, seeds), options);
 }

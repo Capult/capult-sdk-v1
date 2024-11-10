@@ -7,12 +7,19 @@
  */
 
 import { Context, Pda, PublicKey, Signer, TransactionBuilder, transactionBuilder } from '@metaplex-foundation/umi';
-import { Serializer, bytes, mapSerializer, string, struct } from '@metaplex-foundation/umi/serializers';
-import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners } from '../shared';
+import {
+  Serializer,
+  bytes,
+  mapSerializer,
+  publicKey as publicKeySerializer,
+  string,
+  struct,
+} from '@metaplex-foundation/umi/serializers';
+import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccountMetasAndSigners } from '../shared';
 
 // Accounts.
 export type CreateMetadataInstructionAccounts = {
-  metadata: PublicKey | Pda;
+  metadata?: PublicKey | Pda;
   capultOwnedPda: PublicKey | Pda;
   authority?: Signer;
   payer?: Signer;
@@ -45,7 +52,7 @@ export type CreateMetadataInstructionArgs = CreateMetadataInstructionDataArgs;
 
 // Instruction.
 export function createMetadata(
-  context: Pick<Context, 'identity' | 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'identity' | 'payer' | 'programs'>,
   input: CreateMetadataInstructionAccounts & CreateMetadataInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -64,6 +71,13 @@ export function createMetadata(
   const resolvedArgs: CreateMetadataInstructionArgs = { ...input };
 
   // Default values.
+  if (!resolvedAccounts.metadata.value) {
+    resolvedAccounts.metadata.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([67, 65, 80, 85, 76, 84, 95, 83, 69, 69, 68])),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.capultOwnedPda.value)),
+      bytes().serialize(new Uint8Array([77, 69, 84, 65, 68, 65, 84, 65, 95, 83, 69, 69, 68])),
+    ]);
+  }
   if (!resolvedAccounts.authority.value) {
     resolvedAccounts.authority.value = context.identity;
   }
@@ -72,7 +86,7 @@ export function createMetadata(
   }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
-      'splSystem',
+      'systemProgram',
       '11111111111111111111111111111111'
     );
     resolvedAccounts.systemProgram.isWritable = false;

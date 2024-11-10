@@ -16,8 +16,17 @@ import {
   TransactionBuilder,
   transactionBuilder,
 } from '@metaplex-foundation/umi';
-import { Serializer, bool, bytes, i64, mapSerializer, option, struct } from '@metaplex-foundation/umi/serializers';
-import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners } from '../shared';
+import {
+  Serializer,
+  bool,
+  bytes,
+  i64,
+  mapSerializer,
+  option,
+  publicKey as publicKeySerializer,
+  struct,
+} from '@metaplex-foundation/umi/serializers';
+import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccountMetasAndSigners } from '../shared';
 import {
   AutoClaimSetupArgs,
   AutoClaimSetupArgsArgs,
@@ -29,15 +38,15 @@ import {
 
 // Accounts.
 export type CreateVaultInstructionAccounts = {
-  tokenLockVault: PublicKey | Pda;
+  tokenLockVault?: PublicKey | Pda;
   payer?: Signer;
   withdrawAuthority: PublicKey | Pda;
   delegatedAuthority?: PublicKey | Pda;
   vaultInitKey: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
-  programConfig: PublicKey | Pda;
+  programConfig?: PublicKey | Pda;
   tokenProgram?: PublicKey | Pda;
-  associatedTokenProgram: PublicKey | Pda;
+  associatedTokenProgram?: PublicKey | Pda;
   systemProgram?: PublicKey | Pda;
 };
 
@@ -87,7 +96,7 @@ export type CreateVaultInstructionArgs = CreateVaultInstructionDataArgs;
 
 // Instruction.
 export function createVault(
-  context: Pick<Context, 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'payer' | 'programs'>,
   input: CreateVaultInstructionAccounts & CreateVaultInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -114,8 +123,22 @@ export function createVault(
   const resolvedArgs: CreateVaultInstructionArgs = { ...input };
 
   // Default values.
+  if (!resolvedAccounts.tokenLockVault.value) {
+    resolvedAccounts.tokenLockVault.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([67, 65, 80, 85, 76, 84, 95, 83, 69, 69, 68])),
+      publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.vaultInitKey.value)),
+      bytes().serialize(
+        new Uint8Array([84, 79, 75, 69, 78, 95, 76, 79, 67, 75, 95, 86, 65, 85, 76, 84, 95, 83, 69, 69, 68])
+      ),
+    ]);
+  }
   if (!resolvedAccounts.payer.value) {
     resolvedAccounts.payer.value = context.payer;
+  }
+  if (!resolvedAccounts.programConfig.value) {
+    resolvedAccounts.programConfig.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([80, 82, 79, 71, 82, 65, 77, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])),
+    ]);
   }
   if (!resolvedAccounts.tokenProgram.value) {
     resolvedAccounts.tokenProgram.value = context.programs.getPublicKey(
@@ -124,9 +147,16 @@ export function createVault(
     );
     resolvedAccounts.tokenProgram.isWritable = false;
   }
+  if (!resolvedAccounts.associatedTokenProgram.value) {
+    resolvedAccounts.associatedTokenProgram.value = context.programs.getPublicKey(
+      'associatedTokenProgram',
+      'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
+    );
+    resolvedAccounts.associatedTokenProgram.isWritable = false;
+  }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
-      'splSystem',
+      'systemProgram',
       '11111111111111111111111111111111'
     );
     resolvedAccounts.systemProgram.isWritable = false;

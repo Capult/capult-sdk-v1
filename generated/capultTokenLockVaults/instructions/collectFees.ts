@@ -14,7 +14,7 @@ import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners
 export type CollectFeesInstructionAccounts = {
   withdrawAuthority: Signer;
   recipient: PublicKey | Pda;
-  programConfig: PublicKey | Pda;
+  programConfig?: PublicKey | Pda;
 };
 
 // Data.
@@ -36,7 +36,7 @@ export function getCollectFeesInstructionDataSerializer(): Serializer<
 
 // Instruction.
 export function collectFees(
-  context: Pick<Context, 'programs'>,
+  context: Pick<Context, 'eddsa' | 'programs'>,
   input: CollectFeesInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
@@ -51,6 +51,13 @@ export function collectFees(
     recipient: { index: 1, isWritable: true as boolean, value: input.recipient ?? null },
     programConfig: { index: 2, isWritable: false as boolean, value: input.programConfig ?? null },
   } satisfies ResolvedAccountsWithIndices;
+
+  // Default values.
+  if (!resolvedAccounts.programConfig.value) {
+    resolvedAccounts.programConfig.value = context.eddsa.findPda(programId, [
+      bytes().serialize(new Uint8Array([80, 82, 79, 71, 82, 65, 77, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])),
+    ]);
+  }
 
   // Accounts in order.
   const orderedAccounts: ResolvedAccount[] = Object.values(resolvedAccounts).sort((a, b) => a.index - b.index);

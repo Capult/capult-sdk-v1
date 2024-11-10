@@ -28,6 +28,7 @@ import {
   mapSerializer,
   option,
   publicKey as publicKeySerializer,
+  string,
   struct,
   u16,
   u64,
@@ -160,4 +161,23 @@ export function getSalesFeeConfigGpaBuilder(context: Pick<Context, 'rpc' | 'prog
     })
     .deserializeUsing<SalesFeeConfig>((account) => deserializeSalesFeeConfig(account))
     .whereField('discriminator', new Uint8Array([71, 173, 154, 91, 136, 69, 93, 88]));
+}
+
+export function findSalesFeeConfigPda(context: Pick<Context, 'eddsa' | 'programs'>): Pda {
+  const programId = context.programs.getPublicKey('capultTokenSales', 'CPTSoDzrvBad8fW2DWRgXhb2R5pa8sVdBJvZhfhuyYKe');
+  return context.eddsa.findPda(programId, [string({ size: 'variable' }).serialize('SALES_FEE_CONFIG_SEED')]);
+}
+
+export async function fetchSalesFeeConfigFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  options?: RpcGetAccountOptions
+): Promise<SalesFeeConfig> {
+  return fetchSalesFeeConfig(context, findSalesFeeConfigPda(context), options);
+}
+
+export async function safeFetchSalesFeeConfigFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  options?: RpcGetAccountOptions
+): Promise<SalesFeeConfig | null> {
+  return safeFetchSalesFeeConfig(context, findSalesFeeConfigPda(context), options);
 }

@@ -1,17 +1,19 @@
 {
-  "name": "@capult/sdk",
+  "name": "@capult/capult-sdk-v1",
   "version": "1.0.0",
   "description": "JavaScript SDK for Capult protocol",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "module": "dist/index.mjs",
   "files": [
     "dist",
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc",
-    "prepublishOnly": "npm run build"
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "publishOnly": "npm run build"
   },
+  "type": "module",
   "publishConfig": {
     "access": "public"
   },
@@ -28,7 +30,6 @@
   "author": "Capult",
   "license": "GPL-3.0",
   "devDependencies": {
-    "@metaplex-foundation/umi": "^0.9.2",
     "typescript": "^5.0.0",
     "@types/node": "^20.0.0"
   },
