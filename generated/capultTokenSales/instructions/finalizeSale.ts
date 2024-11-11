@@ -33,7 +33,7 @@ export type FinalizeSaleInstructionAccounts = {
   tokenSale: PublicKey | Pda;
   payer?: Signer;
   authority?: Signer;
-  recipient: PublicKey | Pda;
+  recipient?: PublicKey | Pda;
   tokenSaleAta?: PublicKey | Pda;
   recipientAta?: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
@@ -111,6 +111,9 @@ export function finalizeSale(
   }
   if (!resolvedAccounts.authority.value) {
     resolvedAccounts.authority.value = context.identity;
+  }
+  if (!resolvedAccounts.recipient.value) {
+    resolvedAccounts.recipient.value = context.identity.publicKey;
   }
   if (!resolvedAccounts.tokenProgram.value) {
     resolvedAccounts.tokenProgram.value = context.programs.getPublicKey(

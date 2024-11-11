@@ -20,6 +20,7 @@ import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccou
 export type RemoveTokenInstructionAccounts = {
   tokenDetails?: PublicKey | Pda;
   authority?: Signer;
+  recipient?: Signer;
   tokenMint: PublicKey | Pda;
 };
 
@@ -51,8 +52,9 @@ export function removeToken(
   // Accounts.
   const resolvedAccounts = {
     tokenDetails: { index: 0, isWritable: true as boolean, value: input.tokenDetails ?? null },
-    authority: { index: 1, isWritable: true as boolean, value: input.authority ?? null },
-    tokenMint: { index: 2, isWritable: false as boolean, value: input.tokenMint ?? null },
+    authority: { index: 1, isWritable: false as boolean, value: input.authority ?? null },
+    recipient: { index: 2, isWritable: true as boolean, value: input.recipient ?? null },
+    tokenMint: { index: 3, isWritable: false as boolean, value: input.tokenMint ?? null },
   } satisfies ResolvedAccountsWithIndices;
 
   // Default values.
@@ -69,6 +71,9 @@ export function removeToken(
       publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
       publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.authority.value)),
     ]);
+  }
+  if (!resolvedAccounts.recipient.value) {
+    resolvedAccounts.recipient.value = context.identity;
   }
 
   // Accounts in order.

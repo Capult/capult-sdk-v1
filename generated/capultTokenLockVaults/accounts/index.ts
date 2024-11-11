@@ -7,4 +7,5 @@
  */
 
 export * from './programConfig';
+export * from './royaltyConfig';
 export * from './tokenLockVault';

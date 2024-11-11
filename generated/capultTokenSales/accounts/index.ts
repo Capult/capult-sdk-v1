@@ -10,5 +10,6 @@ export * from './baseAssetV1';
 export * from './baseCollectionV1';
 export * from './programConfig';
 export * from './purchaseRecord';
+export * from './royaltyConfig';
 export * from './salesFeeConfig';
 export * from './tokenSale';

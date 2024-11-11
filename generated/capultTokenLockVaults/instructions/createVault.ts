@@ -42,6 +42,7 @@ export type CreateVaultInstructionAccounts = {
   payer?: Signer;
   withdrawAuthority: PublicKey | Pda;
   delegatedAuthority?: PublicKey | Pda;
+  royaltyConfig?: PublicKey | Pda;
   vaultInitKey: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
   programConfig?: PublicKey | Pda;
@@ -111,12 +112,13 @@ export function createVault(
     payer: { index: 1, isWritable: true as boolean, value: input.payer ?? null },
     withdrawAuthority: { index: 2, isWritable: false as boolean, value: input.withdrawAuthority ?? null },
     delegatedAuthority: { index: 3, isWritable: false as boolean, value: input.delegatedAuthority ?? null },
-    vaultInitKey: { index: 4, isWritable: false as boolean, value: input.vaultInitKey ?? null },
-    tokenMint: { index: 5, isWritable: false as boolean, value: input.tokenMint ?? null },
-    programConfig: { index: 6, isWritable: false as boolean, value: input.programConfig ?? null },
-    tokenProgram: { index: 7, isWritable: false as boolean, value: input.tokenProgram ?? null },
-    associatedTokenProgram: { index: 8, isWritable: false as boolean, value: input.associatedTokenProgram ?? null },
-    systemProgram: { index: 9, isWritable: false as boolean, value: input.systemProgram ?? null },
+    royaltyConfig: { index: 4, isWritable: false as boolean, value: input.royaltyConfig ?? null },
+    vaultInitKey: { index: 5, isWritable: false as boolean, value: input.vaultInitKey ?? null },
+    tokenMint: { index: 6, isWritable: false as boolean, value: input.tokenMint ?? null },
+    programConfig: { index: 7, isWritable: false as boolean, value: input.programConfig ?? null },
+    tokenProgram: { index: 8, isWritable: false as boolean, value: input.tokenProgram ?? null },
+    associatedTokenProgram: { index: 9, isWritable: false as boolean, value: input.associatedTokenProgram ?? null },
+    systemProgram: { index: 10, isWritable: false as boolean, value: input.systemProgram ?? null },
   } satisfies ResolvedAccountsWithIndices;
 
   // Arguments.

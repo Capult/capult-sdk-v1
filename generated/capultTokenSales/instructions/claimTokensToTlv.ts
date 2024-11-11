@@ -37,6 +37,7 @@ export type ClaimTokensToTlvInstructionAccounts = {
   authority?: Signer;
   tokenLockVault: PublicKey | Pda;
   tlvInitKey: PublicKey | Pda;
+  royaltyConfig?: PublicKey | Pda;
   tokenLockVaultsProgramConfig: PublicKey | Pda;
   tokenSaleAta?: PublicKey | Pda;
   tlvAta?: PublicKey | Pda;
@@ -101,18 +102,19 @@ export function claimTokensToTlv(
     authority: { index: 3, isWritable: false as boolean, value: input.authority ?? null },
     tokenLockVault: { index: 4, isWritable: true as boolean, value: input.tokenLockVault ?? null },
     tlvInitKey: { index: 5, isWritable: false as boolean, value: input.tlvInitKey ?? null },
+    royaltyConfig: { index: 6, isWritable: false as boolean, value: input.royaltyConfig ?? null },
     tokenLockVaultsProgramConfig: {
-      index: 6,
+      index: 7,
       isWritable: false as boolean,
       value: input.tokenLockVaultsProgramConfig ?? null,
     },
-    tokenSaleAta: { index: 7, isWritable: true as boolean, value: input.tokenSaleAta ?? null },
-    tlvAta: { index: 8, isWritable: true as boolean, value: input.tlvAta ?? null },
-    tokenMint: { index: 9, isWritable: false as boolean, value: input.tokenMint ?? null },
-    tokenLockVaultsProgram: { index: 10, isWritable: false as boolean, value: input.tokenLockVaultsProgram ?? null },
-    tokenProgram: { index: 11, isWritable: false as boolean, value: input.tokenProgram ?? null },
-    associatedTokenProgram: { index: 12, isWritable: false as boolean, value: input.associatedTokenProgram ?? null },
-    systemProgram: { index: 13, isWritable: false as boolean, value: input.systemProgram ?? null },
+    tokenSaleAta: { index: 8, isWritable: true as boolean, value: input.tokenSaleAta ?? null },
+    tlvAta: { index: 9, isWritable: true as boolean, value: input.tlvAta ?? null },
+    tokenMint: { index: 10, isWritable: false as boolean, value: input.tokenMint ?? null },
+    tokenLockVaultsProgram: { index: 11, isWritable: false as boolean, value: input.tokenLockVaultsProgram ?? null },
+    tokenProgram: { index: 12, isWritable: false as boolean, value: input.tokenProgram ?? null },
+    associatedTokenProgram: { index: 13, isWritable: false as boolean, value: input.associatedTokenProgram ?? null },
+    systemProgram: { index: 14, isWritable: false as boolean, value: input.systemProgram ?? null },
   } satisfies ResolvedAccountsWithIndices;
 
   // Arguments.

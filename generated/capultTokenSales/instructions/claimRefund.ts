@@ -23,7 +23,7 @@ export type ClaimRefundInstructionAccounts = {
   tokenSale: PublicKey | Pda;
   payer?: Signer;
   authority?: Signer;
-  recipient: PublicKey | Pda;
+  recipient?: PublicKey | Pda;
   systemProgram?: PublicKey | Pda;
 };
 
@@ -88,6 +88,9 @@ export function claimRefund(
   }
   if (!resolvedAccounts.payer.value) {
     resolvedAccounts.payer.value = context.payer;
+  }
+  if (!resolvedAccounts.recipient.value) {
+    resolvedAccounts.recipient.value = context.identity.publicKey;
   }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(

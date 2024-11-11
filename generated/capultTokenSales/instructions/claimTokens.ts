@@ -34,7 +34,7 @@ export type ClaimTokensInstructionAccounts = {
   tokenSale: PublicKey | Pda;
   payer?: Signer;
   authority?: Signer;
-  recipient: PublicKey | Pda;
+  recipient?: PublicKey | Pda;
   tokenSaleAta?: PublicKey | Pda;
   recipientAta?: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
@@ -120,6 +120,9 @@ export function claimTokens(
   }
   if (!resolvedAccounts.payer.value) {
     resolvedAccounts.payer.value = context.payer;
+  }
+  if (!resolvedAccounts.recipient.value) {
+    resolvedAccounts.recipient.value = context.identity.publicKey;
   }
   if (!resolvedAccounts.tokenProgram.value) {
     resolvedAccounts.tokenProgram.value = context.programs.getPublicKey(

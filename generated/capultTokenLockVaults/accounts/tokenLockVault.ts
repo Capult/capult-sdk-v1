@@ -49,6 +49,7 @@ export type TokenLockVaultAccountData = {
   tokenMint: PublicKey;
   delegatedAuthority: Option<PublicKey>;
   permanentAuthority: boolean;
+  royaltyConfig: Option<PublicKey>;
   unlockSchedule: UnlockSchedule;
   autoClaimConfig: Option<AutoClaimConfig>;
   withdrawnAmount: bigint;
@@ -62,6 +63,7 @@ export type TokenLockVaultAccountDataArgs = {
   tokenMint: PublicKey;
   delegatedAuthority: OptionOrNullable<PublicKey>;
   permanentAuthority: boolean;
+  royaltyConfig: OptionOrNullable<PublicKey>;
   unlockSchedule: UnlockScheduleArgs;
   autoClaimConfig: OptionOrNullable<AutoClaimConfigArgs>;
   withdrawnAmount: number | bigint;
@@ -82,6 +84,7 @@ export function getTokenLockVaultAccountDataSerializer(): Serializer<
         ['tokenMint', publicKeySerializer()],
         ['delegatedAuthority', option(publicKeySerializer())],
         ['permanentAuthority', bool()],
+        ['royaltyConfig', option(publicKeySerializer())],
         ['unlockSchedule', getUnlockScheduleSerializer()],
         ['autoClaimConfig', option(getAutoClaimConfigSerializer())],
         ['withdrawnAmount', u64()],
@@ -159,6 +162,7 @@ export function getTokenLockVaultGpaBuilder(context: Pick<Context, 'rpc' | 'prog
       tokenMint: PublicKey;
       delegatedAuthority: OptionOrNullable<PublicKey>;
       permanentAuthority: boolean;
+      royaltyConfig: OptionOrNullable<PublicKey>;
       unlockSchedule: UnlockScheduleArgs;
       autoClaimConfig: OptionOrNullable<AutoClaimConfigArgs>;
       withdrawnAmount: number | bigint;
@@ -171,6 +175,7 @@ export function getTokenLockVaultGpaBuilder(context: Pick<Context, 'rpc' | 'prog
       tokenMint: [40, publicKeySerializer()],
       delegatedAuthority: [72, option(publicKeySerializer())],
       permanentAuthority: [null, bool()],
+      royaltyConfig: [null, option(publicKeySerializer())],
       unlockSchedule: [null, getUnlockScheduleSerializer()],
       autoClaimConfig: [null, option(getAutoClaimConfigSerializer())],
       withdrawnAmount: [null, u64()],

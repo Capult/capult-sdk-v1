@@ -13,7 +13,7 @@ import { ResolvedAccount, ResolvedAccountsWithIndices, getAccountMetasAndSigners
 // Accounts.
 export type CollectFeesInstructionAccounts = {
   withdrawAuthority: Signer;
-  recipient: PublicKey | Pda;
+  recipient?: PublicKey | Pda;
   programConfig?: PublicKey | Pda;
 };
 
@@ -36,7 +36,7 @@ export function getCollectFeesInstructionDataSerializer(): Serializer<
 
 // Instruction.
 export function collectFees(
-  context: Pick<Context, 'eddsa' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'identity' | 'programs'>,
   input: CollectFeesInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
@@ -53,6 +53,9 @@ export function collectFees(
   } satisfies ResolvedAccountsWithIndices;
 
   // Default values.
+  if (!resolvedAccounts.recipient.value) {
+    resolvedAccounts.recipient.value = context.identity.publicKey;
+  }
   if (!resolvedAccounts.programConfig.value) {
     resolvedAccounts.programConfig.value = context.eddsa.findPda(programId, [
       bytes().serialize(new Uint8Array([80, 82, 79, 71, 82, 65, 77, 95, 67, 79, 78, 70, 73, 71, 95, 83, 69, 69, 68])),

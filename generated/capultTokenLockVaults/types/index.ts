@@ -13,4 +13,5 @@ export * from './cliff';
 export * from './configAuthorityType';
 export * from './feeConfig';
 export * from './rewardConfig';
+export * from './royaltyAuthorityType';
 export * from './unlockSchedule';

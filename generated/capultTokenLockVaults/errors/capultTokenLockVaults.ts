@@ -571,6 +571,19 @@ export class AuthorityAlreadyPermanentError extends ProgramError {
 codeToErrorMap.set(0x179a, AuthorityAlreadyPermanentError);
 nameToErrorMap.set('AuthorityAlreadyPermanent', AuthorityAlreadyPermanentError);
 
+/** InsufficientRoyaltyLamportBalance: Insufficient royalty lamport balance */
+export class InsufficientRoyaltyLamportBalanceError extends ProgramError {
+  override readonly name: string = 'InsufficientRoyaltyLamportBalance';
+
+  readonly code: number = 0x179b; // 6043
+
+  constructor(program: Program, cause?: Error) {
+    super('Insufficient royalty lamport balance', program, cause);
+  }
+}
+codeToErrorMap.set(0x179b, InsufficientRoyaltyLamportBalanceError);
+nameToErrorMap.set('InsufficientRoyaltyLamportBalance', InsufficientRoyaltyLamportBalanceError);
+
 /**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors

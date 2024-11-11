@@ -15,7 +15,7 @@ export type CollectFeesInstructionAccounts = {
   tokenSale: PublicKey | Pda;
   payer?: Signer;
   withdrawAuthority: Signer;
-  recipient: PublicKey | Pda;
+  recipient?: PublicKey | Pda;
   feeConfig?: PublicKey | Pda;
   systemProgram?: PublicKey | Pda;
 };
@@ -46,7 +46,7 @@ export type CollectFeesInstructionArgs = CollectFeesInstructionDataArgs;
 
 // Instruction.
 export function collectFees(
-  context: Pick<Context, 'eddsa' | 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'identity' | 'payer' | 'programs'>,
   input: CollectFeesInstructionAccounts & CollectFeesInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -68,6 +68,9 @@ export function collectFees(
   // Default values.
   if (!resolvedAccounts.payer.value) {
     resolvedAccounts.payer.value = context.payer;
+  }
+  if (!resolvedAccounts.recipient.value) {
+    resolvedAccounts.recipient.value = context.identity.publicKey;
   }
   if (!resolvedAccounts.feeConfig.value) {
     resolvedAccounts.feeConfig.value = context.eddsa.findPda(programId, [

@@ -34,7 +34,7 @@ export type BuyTokensInstructionAccounts = {
   tokenSale: PublicKey | Pda;
   purchaseRecord?: PublicKey | Pda;
   payer?: Signer;
-  recipient: PublicKey | Pda;
+  recipient?: PublicKey | Pda;
   tokenSaleAta?: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
   whitelistToken?: PublicKey | Pda;
@@ -85,7 +85,7 @@ export type BuyTokensInstructionArgs = BuyTokensInstructionDataArgs;
 
 // Instruction.
 export function buyTokens(
-  context: Pick<Context, 'eddsa' | 'payer' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'identity' | 'payer' | 'programs'>,
   input: BuyTokensInstructionAccounts & BuyTokensInstructionArgs
 ): TransactionBuilder {
   // Program ID.
@@ -111,6 +111,9 @@ export function buyTokens(
   const resolvedArgs: BuyTokensInstructionArgs = { ...input };
 
   // Default values.
+  if (!resolvedAccounts.recipient.value) {
+    resolvedAccounts.recipient.value = context.identity.publicKey;
+  }
   if (!resolvedAccounts.purchaseRecord.value) {
     resolvedAccounts.purchaseRecord.value = context.eddsa.findPda(programId, [
       bytes().serialize(new Uint8Array([67, 65, 80, 85, 76, 84, 95, 83, 69, 69, 68])),

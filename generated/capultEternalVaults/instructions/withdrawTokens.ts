@@ -34,7 +34,7 @@ export type WithdrawTokensInstructionAccounts = {
   authority?: Signer;
   payer?: Signer;
   vaultAta?: PublicKey | Pda;
-  recipient: PublicKey | Pda;
+  recipient?: PublicKey | Pda;
   recipientAta?: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
   tokenProgram?: PublicKey | Pda;
@@ -125,6 +125,9 @@ export function withdrawTokens(
       publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenProgram.value)),
       publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
     ]);
+  }
+  if (!resolvedAccounts.recipient.value) {
+    resolvedAccounts.recipient.value = context.identity.publicKey;
   }
   if (!resolvedAccounts.recipientAta.value) {
     resolvedAccounts.recipientAta.value = context.eddsa.findPda(programId, [

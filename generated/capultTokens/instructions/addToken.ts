@@ -19,6 +19,7 @@ import { ResolvedAccount, ResolvedAccountsWithIndices, expectPublicKey, getAccou
 // Accounts.
 export type AddTokenInstructionAccounts = {
   tokenDetails?: PublicKey | Pda;
+  payer?: Signer;
   authority?: Signer;
   tokenMint: PublicKey | Pda;
   systemProgram?: PublicKey | Pda;
@@ -43,7 +44,7 @@ export function getAddTokenInstructionDataSerializer(): Serializer<
 
 // Instruction.
 export function addToken(
-  context: Pick<Context, 'eddsa' | 'identity' | 'programs'>,
+  context: Pick<Context, 'eddsa' | 'identity' | 'payer' | 'programs'>,
   input: AddTokenInstructionAccounts
 ): TransactionBuilder {
   // Program ID.
@@ -52,9 +53,10 @@ export function addToken(
   // Accounts.
   const resolvedAccounts = {
     tokenDetails: { index: 0, isWritable: true as boolean, value: input.tokenDetails ?? null },
-    authority: { index: 1, isWritable: true as boolean, value: input.authority ?? null },
-    tokenMint: { index: 2, isWritable: false as boolean, value: input.tokenMint ?? null },
-    systemProgram: { index: 3, isWritable: false as boolean, value: input.systemProgram ?? null },
+    payer: { index: 1, isWritable: true as boolean, value: input.payer ?? null },
+    authority: { index: 2, isWritable: false as boolean, value: input.authority ?? null },
+    tokenMint: { index: 3, isWritable: false as boolean, value: input.tokenMint ?? null },
+    systemProgram: { index: 4, isWritable: false as boolean, value: input.systemProgram ?? null },
   } satisfies ResolvedAccountsWithIndices;
 
   // Default values.
@@ -71,6 +73,9 @@ export function addToken(
       publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.tokenMint.value)),
       publicKeySerializer().serialize(expectPublicKey(resolvedAccounts.authority.value)),
     ]);
+  }
+  if (!resolvedAccounts.payer.value) {
+    resolvedAccounts.payer.value = context.payer;
   }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(

@@ -909,6 +909,45 @@ export class SaleSolAmountTooHighError extends ProgramError {
 codeToErrorMap.set(0x17b4, SaleSolAmountTooHighError);
 nameToErrorMap.set('SaleSolAmountTooHigh', SaleSolAmountTooHighError);
 
+/** InvalidRoyaltyConfig: Invalid royalty config */
+export class InvalidRoyaltyConfigError extends ProgramError {
+  override readonly name: string = 'InvalidRoyaltyConfig';
+
+  readonly code: number = 0x17b5; // 6069
+
+  constructor(program: Program, cause?: Error) {
+    super('Invalid royalty config', program, cause);
+  }
+}
+codeToErrorMap.set(0x17b5, InvalidRoyaltyConfigError);
+nameToErrorMap.set('InvalidRoyaltyConfig', InvalidRoyaltyConfigError);
+
+/** RoyaltyConfigNotRequired: Royalty config not required */
+export class RoyaltyConfigNotRequiredError extends ProgramError {
+  override readonly name: string = 'RoyaltyConfigNotRequired';
+
+  readonly code: number = 0x17b6; // 6070
+
+  constructor(program: Program, cause?: Error) {
+    super('Royalty config not required', program, cause);
+  }
+}
+codeToErrorMap.set(0x17b6, RoyaltyConfigNotRequiredError);
+nameToErrorMap.set('RoyaltyConfigNotRequired', RoyaltyConfigNotRequiredError);
+
+/** RoyaltyConfigRequired: Royalty config required */
+export class RoyaltyConfigRequiredError extends ProgramError {
+  override readonly name: string = 'RoyaltyConfigRequired';
+
+  readonly code: number = 0x17b7; // 6071
+
+  constructor(program: Program, cause?: Error) {
+    super('Royalty config required', program, cause);
+  }
+}
+codeToErrorMap.set(0x17b7, RoyaltyConfigRequiredError);
+nameToErrorMap.set('RoyaltyConfigRequired', RoyaltyConfigRequiredError);
+
 /**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors

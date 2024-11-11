@@ -16,7 +16,7 @@ export type CloseVaultInstructionAccounts = {
   vaultAta: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
   authority?: Signer;
-  recipient: PublicKey | Pda;
+  recipient?: PublicKey | Pda;
   tokenProgram?: PublicKey | Pda;
 };
 
@@ -61,6 +61,9 @@ export function closeVault(
   // Default values.
   if (!resolvedAccounts.authority.value) {
     resolvedAccounts.authority.value = context.identity;
+  }
+  if (!resolvedAccounts.recipient.value) {
+    resolvedAccounts.recipient.value = context.identity.publicKey;
   }
   if (!resolvedAccounts.tokenProgram.value) {
     resolvedAccounts.tokenProgram.value = context.programs.getPublicKey(

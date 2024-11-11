@@ -15,7 +15,7 @@ export type RemoveMetadataInstructionAccounts = {
   metadata: PublicKey | Pda;
   capultOwnedPda: PublicKey | Pda;
   authority?: Signer;
-  recipient: PublicKey | Pda;
+  recipient?: PublicKey | Pda;
 };
 
 // Data.
@@ -54,6 +54,9 @@ export function removeMetadata(
   // Default values.
   if (!resolvedAccounts.authority.value) {
     resolvedAccounts.authority.value = context.identity;
+  }
+  if (!resolvedAccounts.recipient.value) {
+    resolvedAccounts.recipient.value = context.identity.publicKey;
   }
 
   // Accounts in order.

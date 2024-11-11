@@ -18,6 +18,7 @@ export * from './saleFeeConfig';
 export * from './saleParameters';
 export * from './saleSchedule';
 export * from './unlockSchedule';
+export * from './unlockScheduleSetup';
 export * from './updateAuthority';
 export * from './whitelistTokenConfig';
 export * from './whitelistTokenConfigSetup';

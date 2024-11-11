@@ -150,3 +150,39 @@ export function getTokenDetailsGpaBuilder(context: Pick<Context, 'rpc' | 'progra
     .deserializeUsing<TokenDetails>((account) => deserializeTokenDetails(account))
     .whereField('discriminator', new Uint8Array([83, 49, 200, 250, 222, 246, 143, 58]));
 }
+
+export function findTokenDetailsPda(
+  context: Pick<Context, 'eddsa' | 'programs'>,
+  seeds: {
+    tokenMint: PublicKey;
+
+    authority: PublicKey;
+  }
+): Pda {
+  const programId = context.programs.getPublicKey('capultTokens', 'CPLT8dWFQ1VH4ZJkvqSrLLFFPtCcKDm4XJ51t4K4mEiN');
+  return context.eddsa.findPda(programId, [
+    bytes().serialize(
+      new Uint8Array([
+        67, 65, 80, 85, 76, 84, 95, 84, 79, 75, 69, 78, 95, 68, 69, 84, 65, 73, 76, 83, 95, 83, 69, 69, 68,
+      ])
+    ),
+    publicKeySerializer().serialize(seeds.tokenMint),
+    publicKeySerializer().serialize(seeds.authority),
+  ]);
+}
+
+export async function fetchTokenDetailsFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  seeds: Parameters<typeof findTokenDetailsPda>[1],
+  options?: RpcGetAccountOptions
+): Promise<TokenDetails> {
+  return fetchTokenDetails(context, findTokenDetailsPda(context, seeds), options);
+}
+
+export async function safeFetchTokenDetailsFromSeeds(
+  context: Pick<Context, 'eddsa' | 'programs' | 'rpc'>,
+  seeds: Parameters<typeof findTokenDetailsPda>[1],
+  options?: RpcGetAccountOptions
+): Promise<TokenDetails | null> {
+  return safeFetchTokenDetails(context, findTokenDetailsPda(context, seeds), options);
+}

@@ -34,12 +34,12 @@ import {
   PriceArgs,
   SaleParameters,
   SaleParametersArgs,
-  UnlockSchedule,
-  UnlockScheduleArgs,
+  UnlockScheduleSetup,
+  UnlockScheduleSetupArgs,
   getAccessConfigSetupSerializer,
   getPriceSerializer,
   getSaleParametersSerializer,
-  getUnlockScheduleSerializer,
+  getUnlockScheduleSetupSerializer,
 } from '../types';
 
 // Accounts.
@@ -50,6 +50,7 @@ export type CreateSaleInstructionAccounts = {
   saleInitKey: PublicKey | Pda;
   payerAta?: PublicKey | Pda;
   tokenSaleAta?: PublicKey | Pda;
+  royaltyConfig?: PublicKey | Pda;
   tokenMint: PublicKey | Pda;
   whitelistCollection?: PublicKey | Pda;
   feeConfig?: PublicKey | Pda;
@@ -68,7 +69,7 @@ export type CreateSaleInstructionData = {
   startSlot: Option<bigint>;
   endSlot: Option<bigint>;
   saleParameters: SaleParameters;
-  unlockSchedule: Option<UnlockSchedule>;
+  unlockSchedule: Option<UnlockScheduleSetup>;
   accessConfig: AccessConfigSetup;
 };
 
@@ -80,7 +81,7 @@ export type CreateSaleInstructionDataArgs = {
   startSlot: OptionOrNullable<number | bigint>;
   endSlot: OptionOrNullable<number | bigint>;
   saleParameters: SaleParametersArgs;
-  unlockSchedule: OptionOrNullable<UnlockScheduleArgs>;
+  unlockSchedule: OptionOrNullable<UnlockScheduleSetupArgs>;
   accessConfig: AccessConfigSetupArgs;
 };
 
@@ -99,7 +100,7 @@ export function getCreateSaleInstructionDataSerializer(): Serializer<
         ['startSlot', option(u64())],
         ['endSlot', option(u64())],
         ['saleParameters', getSaleParametersSerializer()],
-        ['unlockSchedule', option(getUnlockScheduleSerializer())],
+        ['unlockSchedule', option(getUnlockScheduleSetupSerializer())],
         ['accessConfig', getAccessConfigSetupSerializer()],
       ],
       { description: 'CreateSaleInstructionData' }
@@ -127,12 +128,13 @@ export function createSale(
     saleInitKey: { index: 3, isWritable: false as boolean, value: input.saleInitKey ?? null },
     payerAta: { index: 4, isWritable: true as boolean, value: input.payerAta ?? null },
     tokenSaleAta: { index: 5, isWritable: true as boolean, value: input.tokenSaleAta ?? null },
-    tokenMint: { index: 6, isWritable: false as boolean, value: input.tokenMint ?? null },
-    whitelistCollection: { index: 7, isWritable: false as boolean, value: input.whitelistCollection ?? null },
-    feeConfig: { index: 8, isWritable: false as boolean, value: input.feeConfig ?? null },
-    tokenProgram: { index: 9, isWritable: false as boolean, value: input.tokenProgram ?? null },
-    associatedTokenProgram: { index: 10, isWritable: false as boolean, value: input.associatedTokenProgram ?? null },
-    systemProgram: { index: 11, isWritable: false as boolean, value: input.systemProgram ?? null },
+    royaltyConfig: { index: 6, isWritable: false as boolean, value: input.royaltyConfig ?? null },
+    tokenMint: { index: 7, isWritable: false as boolean, value: input.tokenMint ?? null },
+    whitelistCollection: { index: 8, isWritable: false as boolean, value: input.whitelistCollection ?? null },
+    feeConfig: { index: 9, isWritable: false as boolean, value: input.feeConfig ?? null },
+    tokenProgram: { index: 10, isWritable: false as boolean, value: input.tokenProgram ?? null },
+    associatedTokenProgram: { index: 11, isWritable: false as boolean, value: input.associatedTokenProgram ?? null },
+    systemProgram: { index: 12, isWritable: false as boolean, value: input.systemProgram ?? null },
   } satisfies ResolvedAccountsWithIndices;
 
   // Arguments.
