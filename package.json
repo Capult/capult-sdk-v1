@@ -10,7 +10,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "tsup index.ts --format cjs,esm --dts",
     "publishOnly": "npm run build"
   },
   "type": "module",
